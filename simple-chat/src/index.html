@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title>Send a message</title>
+    <link href="style.css" rel="stylesheet"></head>
+    <body>
+        <style>
+            .form {
+                padding-top: 20px;
+                width: 50%;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+               
+                
+                border: 1px solid rgba(25, 25, 25, 0.32);
+                margin-top: 50px;
+            }
+
+            .message {
+                color: rgb(0, 0, 0);
+                font-size: 25px;
+                font-weight: 300;
+                max-width: 70%; 
+                border: 1px solid rgba(25, 25, 25, 0.32);
+                
+ 
+                background-color: #deafeae4;
+                border-radius: 4px;
+                margin: 4px 20px;
+                padding: 10px;
+                margin-bottom: 20px;
+
+                display: flex;
+                flex-direction: column;
+                align-items: end;
+                gap:10px
+            }
+
+            .message-container{
+                display: flex;
+                flex-direction: column;
+                align-items: end;
+            }
+
+            input[type=submit] {
+                visibility: collapse;
+            }
+
+            input {
+                border: 0;
+                outline: none;
+                width: calc(100% - 2px);
+                font-size: 25px;
+                padding: 20px;
+                color: grey;
+                font-weight: 300;
+            }
+
+
+            .input-container{
+
+                padding: 10px;
+                padding-right: 20px;
+                display: flex;
+                border-top: 1px solid rgba(25, 25, 25, 0.32);
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .message-time{
+                font-size: 19px;
+                color: rgb(56, 53, 53);
+            }
+
+        </style>
+        <form class="form" action="/">
+            <div class="message-container">
+            <div class="message">
+                <span class="message-time">432432</span>
+            </div>
+
+            </div>
+            <div class="input-container">
+                <input class="form-input" name="message-text" placeholder="Сообщение" type="text">
+                <img src="../public/attachment.svg" width="34px" height="34px" alt="attach file"/>
+            </div>
+        </form>
+        <script>
+            const form = document.querySelector('form');
+            const input = document.querySelector('.form-input');
+            const message = document.querySelector('.message');
+            const container = document.querySelector('.message-container');
+
+            function loadMessages(showLastOnly = false) {
+                let messagesList = JSON.parse(localStorage.getItem('chatMessages')) || [];
+                console.log(messagesList);
+                if (showLastOnly && messagesList.length > 0){
+                    item = messagesList[messagesList.length - 1]
+                    const messageEl = document.createElement('div');
+                    const messageTimeEl = document.createElement('span');
+                    messageEl.className = 'message';
+                    messageEl.innerText = item.message;
+
+                    messageTimeEl.className = "message-time";
+                    messageTimeEl.innerText = item.time;
+
+                    container.appendChild(messageEl);
+                    messageEl.appendChild(messageTimeEl);
+                } else {
+                messagesList.forEach((item) => {
+                    const messageEl = document.createElement('div');
+                    const messageTimeEl = document.createElement('span');
+                    messageEl.className = 'message';
+                    messageEl.innerText = item.message;
+
+                    messageTimeEl.className = "message-time";
+                    messageTimeEl.innerText = item.time;
+
+                    container.appendChild(messageEl);
+                    messageEl.appendChild(messageTimeEl);
+                })
+                }
+            }
+
+            function handleKeyPress (event) {
+                if (event.keyCode === 13) {
+                    event.preventDefault()
+                    let text = input.value;
+                    input.value = '';
+
+                    const newMessage = {
+                        message: text,
+                        name: "User",
+                        time: `23:41`
+                    };
+                    const messagesList = JSON.parse(localStorage.getItem('chatMessages')) || [];
+                    messagesList.push(newMessage);
+                    localStorage.setItem('chatMessages', JSON.stringify(messagesList));
+                    form.dispatchEvent(new Event('submit'));
+                }
+            }
+
+            function handleSubmit (event) {
+                event.preventDefault();
+                loadMessages(true);
+            }
+
+            form.addEventListener('submit', this.handleSubmit.bind(this));
+            form.addEventListener('keypress', this.handleKeyPress.bind(this));
+
+            container.innerHTML = '';
+            loadMessages(false);
+        </script>
+    <script type="text/javascript" src="bundle.js"></script></body>
+</html>
