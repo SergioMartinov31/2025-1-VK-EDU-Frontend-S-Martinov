@@ -1,0 +1,19 @@
+.header{
+    margin: auto;
+    background-color: rgb(143, 74, 208);
+    width: 40%;
+    padding: 20px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-text { 
+    font-size: 40px;
+    font-weight: 300;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    color: white;
+}

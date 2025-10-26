@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <header class="header">
+        <img class="burger"  src="/burger.svg" width="50" height="50"/>
+        <span class="header-text">Messenger</span>
+        <img class="search" src="/search.svg" width="50" height="50">
+    </header>
+    <main class="chatsList">
+        <div class="list-item">
+            <img class="list-item__img" src="/avatar.svg" width="100" height="100"/>
+            <div class="list-item__info">
+                <div class="middle-container">
+                <span class="name">Серджио</span>
+                <span class="last-msg">Ты куда пропал?</span>
+            </div>
+                <div class="end-container">
+                    <span class="time-msg">15:52</span>
+                    <div class="msg-counter">
+                        <span class="msg-counter__text">99</span>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <div class="edit-container">
+        <button class="edit-btn">
+            <img class="edit-btn__img" src="/edit.svg" width="45" height="45"/>
+        </button>
+    </div>
+
+    <div class="add-chat-modal hidden">
+        <div class="modal-content">
+            <h2 class="modal-content__text">Новый чат</h2>
+            <input type="text" id="username-input" placeholder="Имя пользователя" />
+            <button id="create-chat-btn">Создать</button>
+            <button id="cancel-btn">Отмена</button>
+        </div>
+    </div>
+</body>
+</html>
