@@ -32,6 +32,7 @@ function loadChats() {
             window.location.href = `chat.html?user=${encodeURIComponent(key)}`;
         });
 
+        
         const imgEl = document.createElement('img');
         imgEl.className = 'list-item__img';
         imgEl.src = chatData.avatar || '/avatar.svg';

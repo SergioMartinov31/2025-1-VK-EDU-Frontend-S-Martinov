@@ -18,9 +18,12 @@
 }
 
 .modal-content{
-    width: 30%;
+    position: absolute;
+    top: 30%;
+    left: 37%;
+    width: 25%;
     border: 5px rgb(143, 74, 208) solid;
-    background-color: rgba(255, 255, 255, 0.797);
+    background-color: rgb(255, 255, 255);
     border-radius: 20px;
     padding: 20px;
     margin: auto;
