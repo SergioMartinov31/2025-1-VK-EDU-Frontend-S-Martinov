@@ -1,19 +1,16 @@
-import { chatsList } from './chatsList';
-
-let lsChats = localStorage.getItem('chats')
-if (lsChats) {
-  lsChats = JSON.parse(lsChats);
-}
-
 const getCurrTime = () => new Date().toLocaleTimeString()
 
-export const chats = lsChats || [
+// Начальные данные для чатов
+export const initialChats = [
   {
     id: 0,
+    name: 'Shrek',
+    avatar: 'https://avatar.iran.liara.run/public/boy',
+    unreadMessages: 99,
     messages: [
       {
         isOurs: false,
-        text: 'hello1!',
+        text: 'hello1!jhgjhjh',
         time: getCurrTime(),
       },
       {
@@ -35,6 +32,9 @@ export const chats = lsChats || [
   },
   {
     id: 1,
+    name: 'Donkey',
+    avatar: 'https://avatar.iran.liara.run/public/boy',
+    unreadMessages: 99,
     messages: [
       {
         isOurs: false,
@@ -60,6 +60,9 @@ export const chats = lsChats || [
   },
   {
     id: 2,
+    name: 'Swamp',
+    avatar: 'https://avatar.iran.liara.run/public/boy',
+    unreadMessages: 228,
     messages: [
       {
         isOurs: false,
@@ -85,6 +88,9 @@ export const chats = lsChats || [
   },
   {
     id: 3,
+    name: 'Fiona',
+    avatar: 'https://avatar.iran.liara.run/public/girl',
+    unreadMessages: 0,
     messages: [
       {
         isOurs: false,
@@ -108,20 +114,39 @@ export const chats = lsChats || [
       },
     ]
   },
-].map(chat => {
-  return {
-    ...chat,
-    name: chatsList.find(chatListItem => chatListItem.id === chat.id ).name
+]
+
+// Получить чаты из localStorage или начальные данные
+export const getChats = () => {
+  const storedChats = localStorage.getItem('chats');
+  if (storedChats) {
+    console.log(JSON.parse(storedChats));
+    return JSON.parse(storedChats);
   }
-})
+  // Если в localStorage пусто, сохраняем начальные данные
+  localStorage.setItem('chats', JSON.stringify(initialChats));
+  return initialChats;
+};
 
+// Добавить сообщение в чат
 export const addMyMessageToChat = (id, text) => {
+  const chats = getChats(); // Читаем текущие данные
   const chat = chats.find(chatItem => chatItem.id === id);
-  chat.messages.push({
-    isOurs: true,
-    text,
-    time: getCurrTime(),
-  })
+  
+  if (chat) {
+    chat.messages.push({
+      isOurs: true,
+      text,
+      time: getCurrTime(),
+    });
 
-  localStorage.setItem('chats', JSON.stringify(chats));
-}
+    // Обновляем unreadMessages (можно добавить логику)
+    // chat.unreadMessages += 1;
+
+    // Сохраняем обратно в localStorage
+    localStorage.setItem('chats', JSON.stringify(chats));
+  }
+  
+  return getChats(); // Возвращаем обновленные данные
+};
+

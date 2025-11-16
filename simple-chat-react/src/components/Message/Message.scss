@@ -1,0 +1,38 @@
+.messageContainer{
+  box-sizing: border-box;
+  border-radius: 20px;
+  padding: 10px 15px 2px 15px;
+  display: flex;
+  flex-direction: column;
+  max-width: 60%;
+  margin-right: 5px;
+
+  &--ours{
+    background-color: rgb(187, 209, 233);
+    margin-left: auto;
+  }
+
+  &--theirs{
+    background-color: rgb(197, 198, 198);
+    margin-right: auto;
+  }
+
+  &__text{
+    text-align:start;
+    font-size: 30px;
+    word-wrap: break-word;      /* ← ПЕРЕНОС СЛОВ */
+    word-break: break-word;     /* ← ЛОМАЕМ СЛОВА */
+    overflow-wrap: anywhere; 
+    min-width: 0;
+  }
+
+  &__time{
+    font-size: 20px;
+    align-self: flex-end;
+    text-align: center;
+    white-space: nowrap;
+  }
+}
+
+
+
