@@ -7,7 +7,7 @@ export const ChatInput = ({SendMessage}) => {
     const SubmitInput = (event) => {
       event.preventDefault();
       if (message.trim()) {
-      SendMessage(message); // ← просто текст, ничего лишнего
+      SendMessage(message); 
       setMessage('');
       console.log("ADD",message);
     }

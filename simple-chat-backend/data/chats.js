@@ -1,7 +1,7 @@
 const getCurrTime = () => new Date().toLocaleTimeString()
 
 // Начальные данные для чатов
-export const initialChats = [
+const initialChats = [
   {
     id: 0,
     name: 'Shrek',
@@ -116,21 +116,27 @@ export const initialChats = [
   },
 ]
 
-// Получить чаты из localStorage или начальные данные
-export const getChats = () => {
-  const storedChats = localStorage.getItem('chats');
-  if (storedChats) {
-    console.log(JSON.parse(storedChats));
-    return JSON.parse(storedChats);
-  }
-  // Если в localStorage пусто, сохраняем начальные данные
-  localStorage.setItem('chats', JSON.stringify(initialChats));
-  return initialChats;
+let chats = [...initialChats];
+
+// Получить чаты
+const getChats = () => {
+  return chats;
+};
+
+const getChatsList = () => {
+  return chats.map(chat => ({
+    id: chat.id,
+    name: chat.name,
+    avatar: chat.avatar,
+    unreadMessages: chat.unreadMessages,
+    lastMessage: chat.messages.length > 0 
+      ? chat.messages[chat.messages.length - 1]
+      : { text: 'Нет сообщений', time: '00:00', isOurs: false }
+  }));
 };
 
 // Добавить сообщение в чат
-export const addMyMessageToChat = (id, text) => {
-  const chats = getChats(); // Читаем текущие данные
+const addMessageToChat = (id, text) => {
   const chat = chats.find(chatItem => chatItem.id === id);
   
   if (chat) {
@@ -140,13 +146,23 @@ export const addMyMessageToChat = (id, text) => {
       time: getCurrTime(),
     });
 
-    // Обновляем unreadMessages (можно добавить логику)
-    // chat.unreadMessages += 1;
+    chat.unreadMessages += 1;
 
     // Сохраняем обратно в localStorage
-    localStorage.setItem('chats', JSON.stringify(chats));
+    console.log(`✅ Сообщение добавлено в чат ${id}: "${text}"`);
   }
   
   return getChats(); // Возвращаем обновленные данные
 };
 
+const resetChats = () => {
+  chats = [...initialChats];
+  return getChats();
+};
+
+export {
+  getChats,
+  getChatsList, 
+  addMessageToChat,
+  resetChats
+};

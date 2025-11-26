@@ -14,7 +14,7 @@ export const ChatList = ({ ChatsLog}) => {
       id={chat.id}
       name={chat.name}
       avatar={chat.avatar}
-      messages={chat.messages} // ← передаем весь массив сообщений
+      messages={chat.messages} 
       unreadMessages={chat.unreadMessages}
     />
     </Link>

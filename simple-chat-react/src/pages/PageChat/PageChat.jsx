@@ -3,8 +3,9 @@ import { useParams, Navigate } from 'react-router-dom';
 
 import {Message} from '../../components/Message/Message';
 import { ChatInput } from '../../components/ChatInput/ChatInput';
-import {addMyMessageToChat, getChats} from '../../api/chats.js'
+import {addMyMessageToChat} from '../../api/chatsAPI.js'
 import './PageChat.scss';
+
 
 
 export const PageChat = ({selectChatAPI, setChats}) => {
@@ -28,11 +29,15 @@ export const PageChat = ({selectChatAPI, setChats}) => {
 
 
 
-  const SendMessage = (messageText) => {
-    const updatedChats = addMyMessageToChat(id, messageText);
-    setChats(updatedChats);
+  const SendMessage = async (messageText) => {
+    try {
+    const updatedChats = await addMyMessageToChat(id, messageText);
+    setChats(updatedChats.chats);
+    } catch (error) {
+    console.error('Ошибка отправки:', error);
+    }
   }
-
+unde
   if (!activeChatData) {
     return (
       <div className='Chat-container'>
