@@ -34,5 +34,30 @@
   }
 }
 
+.messageContainer__contextMenu{
+  background-color: white;
+  border-radius: 10px;
+  position: fixed;
+  border: 1px solid black;
+  transform: 0.6s ease-in-out;
+
+}
+
+
+.messageContainer__contextMenu-list{
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+  text-align: start;
+}
+
+.messageContainer__contextMenu-item{
+  padding: 5px 10px;
+  cursor: pointer;
+
+  &:hover{
+    background-color: lightgray;
+  }
+}
 
 

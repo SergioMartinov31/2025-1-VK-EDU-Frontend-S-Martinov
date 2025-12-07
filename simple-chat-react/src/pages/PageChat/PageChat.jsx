@@ -3,7 +3,7 @@ import { useParams, Navigate } from 'react-router-dom';
 
 import {Message} from '../../components/Message/Message';
 import { ChatInput } from '../../components/ChatInput/ChatInput';
-import {addMyMessageToChat} from '../../api/chatsAPI.js'
+import {addMyMessageToChat, deleteMessageFromChat} from '../../api/chatsAPI.js'
 import './PageChat.scss';
 
 
@@ -23,6 +23,16 @@ export const PageChat = ({selectChatAPI, setChats}) => {
     }
   };
 
+  const deleteMessage = async (messageId) => {
+    console.log('Delete message triggered', messageId, activeChatData.messages);
+    try{
+      const updatedChats = await deleteMessageFromChat(chatId, messageId);
+      setChats(updatedChats.chats); 
+    } catch (error){
+      console.error('Ошибка при удалении сообщения:', error);
+    }
+  }
+
   useEffect(() => {
     scrollToBottom();
   }, [activeChatData?.messages, chatId]);
@@ -37,7 +47,7 @@ export const PageChat = ({selectChatAPI, setChats}) => {
     console.error('Ошибка отправки:', error);
     }
   }
-unde
+
   if (!activeChatData) {
     return (
       <div className='Chat-container'>
@@ -49,7 +59,7 @@ unde
   const MessageList = activeChatData.messages.map((message, index) => (
       <li 
       key={index}>
-        <Message isOurs={message.isOurs} text={message.text} time={message.time}></Message>
+        <Message isOurs={message.isOurs} text={message.text} time={message.time} messageId={index} deleteMessage={deleteMessage}></Message>
       </li>
     )
   );
@@ -58,7 +68,7 @@ unde
   return (
     <ul className='Chat-container' >
       <div className="scroll-container" ref={messagesContainerRef}>
-      {MessageList}
+      {(activeChatData.messages.length === 0) ? <h2 className='Chat-container__selectTitle'>Нет сообщений</h2> : MessageList}
       </div>
       <ChatInput SendMessage={SendMessage}></ChatInput>
     </ul>

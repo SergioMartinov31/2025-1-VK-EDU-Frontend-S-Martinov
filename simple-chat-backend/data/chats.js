@@ -155,6 +155,19 @@ const addMessageToChat = (id, text) => {
   return getChats(); // Возвращаем обновленные данные
 };
 
+
+const deleteMessageFromChat = (id, messageId) => {
+  const chat = chats.find(chatItem => chatItem.id === id);
+  
+  if (chat) {
+    chat.messages = chat.messages.filter((msg, index) => index !== messageId);
+
+    console.log(`✅ Сообщение с id ${messageId} удалено из чата ${id}`);
+  }
+  
+  return getChats(); 
+}
+
 const resetChats = () => {
   chats = [...initialChats];
   return getChats();
@@ -164,5 +177,6 @@ export {
   getChats,
   getChatsList, 
   addMessageToChat,
+  deleteMessageFromChat,
   resetChats
 };

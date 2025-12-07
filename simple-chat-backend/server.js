@@ -1,6 +1,6 @@
 import express from 'express'; //Обрабатывает HTTP запросы (GET, POST, PUT, DELETE)
 import cors from 'cors'; // (Cross-Origin Resource Sharing) - разрешает запросы между разными доменами
-import { getChats, getChatsList, addMessageToChat } from './data/chats.js';
+import { getChats, getChatsList, addMessageToChat, deleteMessageFromChat} from './data/chats.js';
 
 const app = express(); 
 const PORT = 3001;
@@ -32,6 +32,16 @@ app.post('/api/chats/:id/messages', (req, res) => {
   res.json({ success: true, chats: updatedChats });
 });
 
+
+app.delete('/api/chats/:id/messages', (req, res) => {
+  const chatId = parseInt(req.params.id);
+  const { messageId } = req.body;
+
+  console.log(`📨 Получен запрос на удаление сообщения ${messageId} из чата ${chatId}`);
+  
+  const updatedChats = deleteMessageFromChat(chatId, messageId);
+  res.json({ success: true, chats: updatedChats });
+});
 
 
 app.listen(PORT, () => {

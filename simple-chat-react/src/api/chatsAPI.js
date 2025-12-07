@@ -46,3 +46,24 @@ export const addMyMessageToChat = async (chatId, text) => {
     throw error
   }
 }
+
+export const deleteMessageFromChat = async (chatId, messageId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/chats/${chatId}/messages`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ messageId }),
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    return response.json()
+    
+  } catch (error) {
+    console.error('❌ Ошибка при удалении сообщения:', error)
+    throw error
+  }
+}
