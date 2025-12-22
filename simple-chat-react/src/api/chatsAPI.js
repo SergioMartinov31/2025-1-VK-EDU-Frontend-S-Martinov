@@ -42,10 +42,33 @@ export const addMyMessageToChat = async (chatId, text) => {
     
     return response.json()
   } catch (error) {
-    console.error('❌ Ошибка при отправке сообщения:', error)
+    console.error('❌ Ошибка при отправке текстового сообщения:', error)
     throw error
   }
 }
+
+export const addMyVoiceMessageToChat = async (chatId, voiceMessageObj) => {
+  try {
+    const formData = new FormData();
+    formData.append('voice', voiceMessageObj.file); // Ключ 'voice' должен совпадать с multer.single('voice')
+    formData.append('duration', voiceMessageObj.duration || 0);
+    
+    const response = await fetch(`${API_BASE_URL}/chats/${chatId}/voice-upload`, {
+      method: 'POST',
+      body: formData, // Не нужно headers для FormData
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return response.json();
+  } catch (error) {
+    console.error('❌ Ошибка при отправке голосового сообщения:', error);
+    throw error;
+  }
+};
+
 
 export const deleteMessageFromChat = async (chatId, messageId) => {
   try {
@@ -63,7 +86,8 @@ export const deleteMessageFromChat = async (chatId, messageId) => {
     return response.json()
     
   } catch (error) {
-    console.error('❌ Ошибка при удалении сообщения:', error)
+    console.error('❌ Ошибка при удалении текстового сообщения:', error)
     throw error
   }
 }
+

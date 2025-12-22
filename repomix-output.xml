@@ -77,6 +77,7 @@ simple-chat-backend/
   data/
     chats.js
   package.json
+  repomix-output.xml
   server.js
 simple-chat-react/
   .git/
@@ -102,6 +103,8 @@ simple-chat-react/
     HEAD
   public/
     inputBtn.svg
+    mic.svg
+    stop.svg
   src/
     api/
       chatsAPI.js
@@ -119,6 +122,8 @@ simple-chat-react/
       Message/
         Message.jsx
         Message.scss
+      VoiceInput/
+        VoiceInput.jsx
     pages/
       PageChat/
         PageChat.jsx
@@ -133,7 +138,6 @@ simple-chat-react/
   eslint.config.js
   index.html
   package.json
-  tsconfig.json
   vite.config.js
 .gitignore
 package.json
@@ -142,6 +146,397 @@ README.md
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="simple-chat-backend/repomix-output.xml">
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+data/
+  chats.js
+package.json
+server.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="data/chats.js">
+const getCurrTime = () => new Date().toLocaleTimeString()
+
+// Начальные данные для чатов
+const initialChats = [
+  {
+    id: 0,
+    name: 'Shrek',
+    avatar: 'https://avatar.iran.liara.run/public/boy',
+    unreadMessages: 99,
+    messages: [
+      {
+        isOurs: false,
+        text: 'hello1!jhgjhjh',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello2!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello3!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello4!',
+        time: getCurrTime(),
+      },
+    ]
+  },
+  {
+    id: 1,
+    name: 'Donkey',
+    avatar: 'https://avatar.iran.liara.run/public/boy',
+    unreadMessages: 99,
+    messages: [
+      {
+        isOurs: false,
+        text: 'hello5!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello6!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello7!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello8!',
+        time: getCurrTime(),
+      },
+    ]
+  },
+  {
+    id: 2,
+    name: 'Swamp',
+    avatar: 'https://avatar.iran.liara.run/public/boy',
+    unreadMessages: 228,
+    messages: [
+      {
+        isOurs: false,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+    ]
+  },
+  {
+    id: 3,
+    name: 'Fiona',
+    avatar: 'https://avatar.iran.liara.run/public/girl',
+    unreadMessages: 0,
+    messages: [
+      {
+        isOurs: false,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+    ]
+  },
+]
+
+let chats = [...initialChats];
+
+// Получить чаты
+const getChats = () => {
+  // console.log('это я', chats)
+  return chats;
+};
+
+const getChatsList = () => {
+  return chats.map(chat => ({
+    id: chat.id,
+    name: chat.name,
+    avatar: chat.avatar,
+    unreadMessages: chat.unreadMessages,
+    lastMessage: chat.messages.length > 0 
+      ? chat.messages[chat.messages.length - 1]
+      : { text: 'Нет сообщений', time: '00:00', isOurs: false }
+  }));
+};
+
+// Добавить сообщение в чат
+const addMessageToChat = (id, text) => {
+  const chat = chats.find(chatItem => chatItem.id === id);
+  
+  if (chat) {
+    chat.messages.push({
+      isOurs: true,
+      text,
+      time: getCurrTime(),
+    });
+
+    chat.unreadMessages += 1;
+
+    // Сохраняем обратно в localStorage
+    console.log(`✅ Сообщение добавлено в чат ${id}: "${text}"`);
+  }
+  
+  return getChats(); // Возвращаем обновленные данные
+};
+
+const addMyVoiceMessageToChat = (id, voiceData) => {
+  const chat = chats.find(chatItem => chatItem.id === id);
+  
+  if (chat) {
+    chat.messages.push({
+      isOurs: true,
+      type: "voice", // Добавляем тип для фильтрации
+      text: "[Голосовое сообщение]",
+      // Выносим voiceMessageObj на верхний уровень:
+      voiceMessageObj: {  
+        voice_text: voiceData.file,       // URL файла
+        duration: voiceData.duration,
+        mime: voiceData.mime || 'audio/webm'
+      },
+      time: getCurrTime(),
+    });
+
+    chat.unreadMessages += 1;
+    console.log(`🎤 Голосовое сообщение сохранено: ${voiceData.file}`);
+  }
+  
+  return getChats();
+};
+
+
+const deleteMessageFromChat = (id, messageId) => {
+  const chat = chats.find(chatItem => chatItem.id === id);
+  
+  if (chat) {
+    chat.messages = chat.messages.filter((msg, index) => index !== messageId);
+
+    console.log(`✅ Сообщение с id ${messageId} удалено из чата ${id}`);
+  }
+  
+  return getChats(); 
+}
+
+const resetChats = () => {
+  chats = [...initialChats];
+  return getChats();
+};
+
+export {
+  getChats,
+  getChatsList, 
+  addMessageToChat,
+  addMyVoiceMessageToChat,
+  deleteMessageFromChat,
+  resetChats
+};
+</file>
+
+<file path="package.json">
+{
+  "name": "simple-chat-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
+}
+</file>
+
+<file path="server.js">
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+
+
+import express from 'express'; //Обрабатывает HTTP запросы (GET, POST, PUT, DELETE)
+import cors from 'cors'; // (Cross-Origin Resource Sharing) - разрешает запросы между разными доменами
+import { getChats, getChatsList, addMessageToChat, addMyVoiceMessageToChat, deleteMessageFromChat} from './data/chats.js';
+
+const app = express(); 
+const PORT = 3001;
+
+// ⭐ MIDDLEWARE - обязательные штуки
+app.use(cors()); // Разрешаем запросы с фронтенда
+app.use(express.json()); // Позволяем читать JSON из тела запроса
+
+const uploadDir = './uploads/voice';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname) || '.webm';
+    cb(null, Date.now() + ext);
+  }
+});
+
+const upload = multer({ storage });
+
+
+app.get('/api/chats', (req, res) => {
+  console.log('📨 Получен запрос на /api/chats');
+  const chats = getChats();
+  res.json(chats); // Отправляем данные обратно
+});
+
+app.get('/api/chats-list', (req, res) => {
+  console.log('📨 Получен запрос на /api/chats-list');
+  const chatsList = getChatsList();
+  res.json(chatsList);
+});
+
+
+app.post('/api/chats/:id/messages', (req, res) => {
+  const chatId = parseInt(req.params.id);
+  const { text } = req.body;
+  
+  console.log(`📨 Получено сообщение для чата ${chatId}: "${text}"`);
+  
+  const updatedChats = addMessageToChat(chatId, text);
+  res.json({ success: true, chats: updatedChats });
+});
+
+app.post('/api/chats/:id/voice-upload', upload.single('voice'), (req, res) => {
+  const chatId = parseInt(req.params.id);
+  const file = req.file;
+  const { duration } = req.body;
+
+  if (!file) {
+    return res.status(400).json({ error: 'Файл не загружен' });
+  }
+
+  console.log(`📥 Загружен файл голосового сообщения: ${file.filename}`);
+
+  const fileUrl = `/uploads/voice/${file.filename}`;
+
+  const updatedChats = addMyVoiceMessageToChat(chatId, {
+    file: fileUrl,
+    duration: Number(duration),
+  });
+
+  res.json({ success: true, chats: updatedChats });
+});
+
+app.use('/uploads', express.static('uploads'));
+
+
+
+app.delete('/api/chats/:id/messages', (req, res) => {
+  const chatId = parseInt(req.params.id);
+  const { messageId } = req.body;
+
+  console.log(`📨 Получен запрос на удаление сообщения ${messageId} из чата ${chatId}`);
+  
+  const updatedChats = deleteMessageFromChat(chatId, messageId);
+  res.json({ success: true, chats: updatedChats });
+});
+
+
+app.listen(PORT, () => {
+  console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
+  console.log('📡 Доступные эндпоинты:');
+  console.log('   GET  http://localhost:3001/api/chats');
+  console.log('   GET  http://localhost:3001/api/chats-list'); 
+  console.log('   POST http://localhost:3001/api/chats/0/messages');
+});
+</file>
+
+</files>
+</file>
 
 <file path="simple-chat-react/.git/hooks/applypatch-msg.sample">
 #!/bin/sh
@@ -1080,59 +1475,276 @@ Unnamed repository; edit this file 'description' to name the repository.
 ref: refs/heads/master
 </file>
 
-<file path="simple-chat-react/tsconfig.json">
-{
-  // Visit https://aka.ms/tsconfig to read more about this file
-  "compilerOptions": {
-    // File Layout
-    // "rootDir": "./src",
-    // "outDir": "./dist",
-
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
-    "types": [],
-    // For nodejs:
-    // "lib": ["esnext"],
-    // "types": ["node"],
-    // and npm install -D @types/node
-
-    // Other Outputs
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-
-    // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-
-    // Recommended Options
-    "strict": true,
-    "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
-  }
-}
+<file path="simple-chat-react/public/mic.svg">
+<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm0-240Zm-40 520v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Zm40-360q17 0 28.5-11.5T520-520v-240q0-17-11.5-28.5T480-800q-17 0-28.5 11.5T440-760v240q0 17 11.5 28.5T480-480Z"/></svg>
 </file>
 
-<file path="package.json">
-{
-  "devDependencies": {
-    "typescript": "^5.9.3"
-  }
-}
+<file path="simple-chat-react/public/stop.svg">
+<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M320-320h320v-320H320v320ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+</file>
+
+<file path="simple-chat-react/src/components/VoiceInput/VoiceInput.jsx">
+// VoiceInput.jsx - ИСПРАВЛЕННЫЙ
+import React, { useState, useEffect, useRef } from 'react';
+
+export const VoiceInput = ({ currentChatId, setChats }) => { // ← ПРИНИМАЕМ setChats
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const streamRef = useRef(null);
+  
+  const [recording, setRecording] = useState(false);
+  const [permission, setPermission] = useState(false);
+  const shouldSendRef = useRef(false);
+
+  // Функция для отправки файла на сервер
+  const uploadVoiceMessage = async (file, duration) => {
+    if (!currentChatId) {
+      console.error('❌ Нет ID чата для отправки голосового сообщения');
+      alert('Выберите чат для отправки сообщения');
+      return;
+    }
+
+    if (!setChats) {
+      console.error('❌ Нет setChats для обновления состояния');
+      alert('Ошибка: не могу обновить чаты');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('voice', file);
+      formData.append('duration', duration || 0);
+
+      console.log(`📤 Отправляю голосовое в чат ${currentChatId}`, {
+        filename: file.name,
+        size: file.size,
+        type: file.type
+      });
+
+      const response = await fetch(`http://localhost:3001/api/chats/${currentChatId}/voice-upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Ответ от сервера:', result);
+      
+      // ВОТ САМОЕ ВАЖНОЕ! Обновляем состояние чатов
+      if (result.chats && setChats) {
+        console.log('🔄 Обновляю состояние чатов...');
+        setChats(result.chats); // ← ОБНОВЛЯЕМ ЧАТЫ
+        
+        // Для отладки - посмотрим что обновили
+        const updatedChat = result.chats.find(chat => chat.id === currentChatId);
+        console.log('💬 Обновленный чат:', updatedChat);
+        console.log('🎤 Последнее сообщение:', updatedChat?.messages?.slice(-1));
+      } else {
+        console.warn('⚠️ Не получилось обновить чаты:', {
+          hasChats: !!result.chats,
+          hasSetChats: !!setChats
+        });
+      }
+
+    } catch (error) {
+      console.error('❌ Ошибка при отправке голосового сообщения:', error);
+      alert(`Ошибка отправки: ${error.message}`);
+    }
+  };
+
+  // Остальной код остается таким же, как у тебя было
+  const getSupportedMimeType = () => {
+    const types = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/ogg;codecs=opus', 
+      'audio/mp4',
+      'audio/mpeg'
+    ];
+    
+    for (let type of types) {
+      if (MediaRecorder.isTypeSupported(type)) {
+        console.log('Поддерживаемый тип:', type);
+        return type;
+      }
+    }
+    console.log('Ни один MIME-тип не поддерживается, используем дефолтный');
+    return '';
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && navigator.mediaDevices) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then(() => {
+          setPermission(true);
+        })
+        .catch((err) => {
+          console.error('Ошибка доступа к микрофону:', err);
+          setPermission(false);
+        });
+    }
+  }, []);
+
+  const startRecording = async () => {
+    if (!permission) {
+      alert('Нет доступа к микрофону');
+      return;
+    }
+
+    if (!currentChatId) {
+      alert('Сначала выберите чат для отправки сообщения');
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: true
+      });
+
+      streamRef.current = stream;
+      const mimeType = getSupportedMimeType();
+      const options = mimeType ? { mimeType } : {};
+      mediaRecorderRef.current = new MediaRecorder(stream, options);
+
+      audioChunksRef.current = [];
+      shouldSendRef.current = false;
+
+      // Обработчик данных
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      // Обработчик завершения записи
+      mediaRecorderRef.current.onstop = async () => {
+        if (audioChunksRef.current.length === 0) {
+          console.log('Нет данных записи');
+          return;
+        }
+
+        console.log('Запись остановлена');
+
+        const blobType = mediaRecorderRef.current?.mimeType || 'audio/webm';
+        const audioBlob = new Blob(audioChunksRef.current, { type: blobType });
+        
+        // Создаем файл
+        const fileName = `voice_${Date.now()}.webm`;
+        const file = new File([audioBlob], fileName, { type: blobType });
+
+        // Если пользователь нажал "отправить" - отправляем на сервер
+        if (shouldSendRef.current) {
+          await uploadVoiceMessage(file, 0); // duration можно вычислить позже
+        } else {
+          console.log('Запись отменена');
+        }
+
+        // Очищаем
+        audioChunksRef.current = [];
+
+        // Останавливаем микрофон
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+          streamRef.current = null;
+        }
+      };
+
+      // Начинаем запись
+      mediaRecorderRef.current.start();
+      setRecording(true);
+      console.log('Запись начата');
+
+    } catch (error) {
+      console.error('Ошибка при записи:', error);
+      alert(`Не удалось начать запись: ${error.message}`);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current?.state === 'recording') {
+      console.log('Останавливаем запись');
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+    }
+  };
+
+  const handleRecordClick = () => {
+    if (recording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  const handleSendClick = () => {
+    shouldSendRef.current = true;
+    stopRecording();
+  };
+
+  const handleCancelClick = () => {
+    shouldSendRef.current = false;
+    stopRecording();
+  };
+
+  // Очистка
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  return (
+    <>
+      {!recording ? (
+        <button 
+          className="Chat-form__button" 
+          type="button"
+          onClick={handleRecordClick}
+          title="Начать запись голосового сообщения"
+        >
+          <img  
+            src="/mic.svg" 
+            alt="Record" 
+            width="30px" 
+            height="40px"
+          />
+        </button>
+      ) : (
+        <>
+          <button 
+            className="Chat-form__button" 
+            type="button"
+            onClick={handleCancelClick}
+            title="Отменить запись"
+            style={{ backgroundColor: '#ff4444' }}
+          >
+            ✕
+          </button>
+          
+          <button 
+            className="Chat-form__button" 
+            type="button"
+            onClick={handleSendClick}
+            title="Отправить запись"
+            style={{ 
+              backgroundColor: '#4CAF50',
+              animation: 'pulse 1.5s infinite'
+            }}
+          >
+            <img src="/inputBtn.svg" alt="Send" width="30px" height="35px"/>
+          </button>
+        </>
+      )}
+    </>
+  );
+};
 </file>
 
 <file path="simple-chat/public/avatar.svg">
@@ -1561,191 +2173,6 @@ body {
 }
 </file>
 
-<file path="simple-chat-backend/data/chats.js">
-const getCurrTime = () => new Date().toLocaleTimeString()
-
-// Начальные данные для чатов
-const initialChats = [
-  {
-    id: 0,
-    name: 'Shrek',
-    avatar: 'https://avatar.iran.liara.run/public/boy',
-    unreadMessages: 99,
-    messages: [
-      {
-        isOurs: false,
-        text: 'hello1!jhgjhjh',
-        time: getCurrTime(),
-      },
-      {
-        isOurs: true,
-        text: 'hello2!',
-        time: getCurrTime(),
-      },
-      {
-        isOurs: true,
-        text: 'hello3!',
-        time: getCurrTime(),
-      },
-      {
-        isOurs: true,
-        text: 'hello4!',
-        time: getCurrTime(),
-      },
-    ]
-  },
-  {
-    id: 1,
-    name: 'Donkey',
-    avatar: 'https://avatar.iran.liara.run/public/boy',
-    unreadMessages: 99,
-    messages: [
-      {
-        isOurs: false,
-        text: 'hello5!',
-        time: getCurrTime(),
-      },
-      {
-        isOurs: true,
-        text: 'hello6!',
-        time: getCurrTime(),
-      },
-      {
-        isOurs: true,
-        text: 'hello7!',
-        time: getCurrTime(),
-      },
-      {
-        isOurs: true,
-        text: 'hello8!',
-        time: getCurrTime(),
-      },
-    ]
-  },
-  {
-    id: 2,
-    name: 'Swamp',
-    avatar: 'https://avatar.iran.liara.run/public/boy',
-    unreadMessages: 228,
-    messages: [
-      {
-        isOurs: false,
-        text: 'hello!',
-        time: getCurrTime(),
-      },
-      {
-        isOurs: true,
-        text: 'hello!',
-        time: getCurrTime(),
-      },
-      {
-        isOurs: true,
-        text: 'hello!',
-        time: getCurrTime(),
-      },
-      {
-        isOurs: true,
-        text: 'hello!',
-        time: getCurrTime(),
-      },
-    ]
-  },
-  {
-    id: 3,
-    name: 'Fiona',
-    avatar: 'https://avatar.iran.liara.run/public/girl',
-    unreadMessages: 0,
-    messages: [
-      {
-        isOurs: false,
-        text: 'hello!',
-        time: getCurrTime(),
-      },
-      {
-        isOurs: true,
-        text: 'hello!',
-        time: getCurrTime(),
-      },
-      {
-        isOurs: true,
-        text: 'hello!',
-        time: getCurrTime(),
-      },
-      {
-        isOurs: true,
-        text: 'hello!',
-        time: getCurrTime(),
-      },
-    ]
-  },
-]
-
-let chats = [...initialChats];
-
-// Получить чаты
-const getChats = () => {
-  return chats;
-};
-
-const getChatsList = () => {
-  return chats.map(chat => ({
-    id: chat.id,
-    name: chat.name,
-    avatar: chat.avatar,
-    unreadMessages: chat.unreadMessages,
-    lastMessage: chat.messages.length > 0 
-      ? chat.messages[chat.messages.length - 1]
-      : { text: 'Нет сообщений', time: '00:00', isOurs: false }
-  }));
-};
-
-// Добавить сообщение в чат
-const addMessageToChat = (id, text) => {
-  const chat = chats.find(chatItem => chatItem.id === id);
-  
-  if (chat) {
-    chat.messages.push({
-      isOurs: true,
-      text,
-      time: getCurrTime(),
-    });
-
-    chat.unreadMessages += 1;
-
-    // Сохраняем обратно в localStorage
-    console.log(`✅ Сообщение добавлено в чат ${id}: "${text}"`);
-  }
-  
-  return getChats(); // Возвращаем обновленные данные
-};
-
-
-const deleteMessageFromChat = (id, messageId) => {
-  const chat = chats.find(chatItem => chatItem.id === id);
-  
-  if (chat) {
-    chat.messages = chat.messages.filter((msg, index) => index !== messageId);
-
-    console.log(`✅ Сообщение с id ${messageId} удалено из чата ${id}`);
-  }
-  
-  return getChats(); 
-}
-
-const resetChats = () => {
-  chats = [...initialChats];
-  return getChats();
-};
-
-export {
-  getChats,
-  getChatsList, 
-  addMessageToChat,
-  deleteMessageFromChat,
-  resetChats
-};
-</file>
-
 <file path="simple-chat-backend/package.json">
 {
   "name": "simple-chat-backend",
@@ -1768,136 +2195,8 @@ export {
 }
 </file>
 
-<file path="simple-chat-backend/server.js">
-import express from 'express'; //Обрабатывает HTTP запросы (GET, POST, PUT, DELETE)
-import cors from 'cors'; // (Cross-Origin Resource Sharing) - разрешает запросы между разными доменами
-import { getChats, getChatsList, addMessageToChat, deleteMessageFromChat} from './data/chats.js';
-
-const app = express(); 
-const PORT = 3001;
-
-// ⭐ MIDDLEWARE - обязательные штуки
-app.use(cors()); // Разрешаем запросы с фронтенда
-app.use(express.json()); // Позволяем читать JSON из тела запроса
-
-app.get('/api/chats', (req, res) => {
-  console.log('📨 Получен запрос на /api/chats');
-  const chats = getChats();
-  res.json(chats); // Отправляем данные обратно
-});
-
-app.get('/api/chats-list', (req, res) => {
-  console.log('📨 Получен запрос на /api/chats-list');
-  const chatsList = getChatsList();
-  res.json(chatsList);
-});
-
-
-app.post('/api/chats/:id/messages', (req, res) => {
-  const chatId = parseInt(req.params.id);
-  const { text } = req.body;
-  
-  console.log(`📨 Получено сообщение для чата ${chatId}: "${text}"`);
-  
-  const updatedChats = addMessageToChat(chatId, text);
-  res.json({ success: true, chats: updatedChats });
-});
-
-
-app.delete('/api/chats/:id/messages', (req, res) => {
-  const chatId = parseInt(req.params.id);
-  const { messageId } = req.body;
-
-  console.log(`📨 Получен запрос на удаление сообщения ${messageId} из чата ${chatId}`);
-  
-  const updatedChats = deleteMessageFromChat(chatId, messageId);
-  res.json({ success: true, chats: updatedChats });
-});
-
-
-app.listen(PORT, () => {
-  console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
-  console.log('📡 Доступные эндпоинты:');
-  console.log('   GET  http://localhost:3001/api/chats');
-  console.log('   GET  http://localhost:3001/api/chats-list'); 
-  console.log('   POST http://localhost:3001/api/chats/0/messages');
-});
-</file>
-
 <file path="simple-chat-react/public/inputBtn.svg">
 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>
-</file>
-
-<file path="simple-chat-react/src/api/chatsAPI.js">
-const API_BASE_URL = 'http://localhost:3001/api';
-
-export const getChats = async () => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/chats`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  } catch (error) {
-    console.error('Ошибка при загрузке чатов:', error);
-    throw error;
-  }
-};
-
-export const getChatsList = async () => {
-  try{
-    const response = await fetch(`${API_BASE_URL}/chats-list`);
-    if (!response.ok){
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    return response.json();
-  } catch(error) {
-    console.error('Ошибка при загрузке списка чатов:', error);
-    throw error
-  }
-}
-
-export const addMyMessageToChat = async (chatId, text) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/chats/${chatId}/messages`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ text }),
-    })
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    
-    return response.json()
-  } catch (error) {
-    console.error('❌ Ошибка при отправке сообщения:', error)
-    throw error
-  }
-}
-
-export const deleteMessageFromChat = async (chatId, messageId) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/chats/${chatId}/messages`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ messageId }),
-    })
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    return response.json()
-    
-  } catch (error) {
-    console.error('❌ Ошибка при удалении сообщения:', error)
-    throw error
-  }
-}
 </file>
 
 <file path="simple-chat-react/src/components/ChatInput/ChatInput.scss">
@@ -2064,139 +2363,6 @@ export const ChatListItem = ({id, name, avatar, messages, unreadMessages}) => {
 .msg-counter__text{
     color: white;
     font-size: 18px;
-}
-</file>
-
-<file path="simple-chat-react/src/components/Message/Message.jsx">
-import './Message.scss'
-import { useState, useEffect, useRef} from 'react';
-
-export const Message = ({isOurs, text, time, messageId,deleteMessage}) => {
-  const [contextMenuVisible, setContextMenuVisible] = useState({
-    visible: false,
-    x: 0,
-    y: 0
-  });
-
-  const menuRef = useRef(null);
-  const messageRef = useRef(null);
-
-  const handleContextMenu = (event) => {
-    event.preventDefault();
-    setContextMenuVisible({
-      visible: true,
-      x: event.pageX,
-      y: event.pageY
-    });
-    console.log('Context menu opened');
-  }
-
-  const handleMenuMouseLeave = () => {
-    setContextMenuVisible({ visible: false, x: 0, y: 0 });
-  };
-
-  useEffect(() => {
-    console.log('Context menu visibility changed:', contextMenuVisible.visible);
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)){
-        setContextMenuVisible({ visible: false, x: 0, y: 0 });
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
-
-
-
-  
-
-
-  const NormalTime = time.slice(0,5);
-  return(
-    <div ref={messageRef} className={`messageContainer ${isOurs ? 'messageContainer--ours' : 'messageContainer--theirs'}`} onContextMenu={handleContextMenu} onMouseLeave={handleMenuMouseLeave}>
-      <span className="messageContainer__text">{text}</span>
-      <span className="messageContainer__time">{NormalTime}</span>
-
-      <div ref={menuRef} className='messageContainer__contextMenu' style={{display: contextMenuVisible.visible ? 'block' : 'none', top: contextMenuVisible.y, left: contextMenuVisible.x}}>
-        <ul className='messageContainer__contextMenu-list'>
-          <li className='messageContainer__contextMenu-item'>
-            1. Копировать текст
-          </li>
-          <li className='messageContainer__contextMenu-item' onClick={() => deleteMessage(messageId)}>
-            2. Удалить сообщение
-          </li>
-        </ul>
-      </div>
-    </div>
-  )
-}
-</file>
-
-<file path="simple-chat-react/src/components/Message/Message.scss">
-.messageContainer{
-  box-sizing: border-box;
-  border-radius: 20px;
-  padding: 10px 15px 2px 15px;
-  display: flex;
-  flex-direction: column;
-  max-width: 60%;
-  margin-right: 5px;
-
-  &--ours{
-    background-color: rgb(187, 209, 233);
-    margin-left: auto;
-  }
-
-  &--theirs{
-    background-color: rgb(197, 198, 198);
-    margin-right: auto;
-  }
-
-  &__text{
-    text-align:start;
-    font-size: 30px;
-    word-wrap: break-word;      /* ← ПЕРЕНОС СЛОВ */
-    word-break: break-word;     /* ← ЛОМАЕМ СЛОВА */
-    overflow-wrap: anywhere; 
-    min-width: 0;
-  }
-
-  &__time{
-    font-size: 20px;
-    align-self: flex-end;
-    text-align: center;
-    white-space: nowrap;
-  }
-}
-
-.messageContainer__contextMenu{
-  background-color: white;
-  border-radius: 10px;
-  position: fixed;
-  border: 1px solid black;
-  transform: 0.6s ease-in-out;
-
-}
-
-
-.messageContainer__contextMenu-list{
-  list-style: none;
-  padding: 10px;
-  margin: 0;
-  text-align: start;
-}
-
-.messageContainer__contextMenu-item{
-  padding: 5px 10px;
-  cursor: pointer;
-
-  &:hover{
-    background-color: lightgray;
-  }
 }
 </file>
 
@@ -2377,12 +2543,21 @@ export default defineConfig([
 </file>
 
 <file path="simple-chat-react/vite.config.js">
+// simple-chat-react/vite.config.js
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      }
+    }
+  }
 })
 </file>
 
@@ -2471,6 +2646,18 @@ jspm_packages/
 
 # DynamoDB Local files
 .dynamodb/
+</file>
+
+<file path="package.json">
+{
+  "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "^2.1.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "multer": "^2.0.2"
+  }
+}
 </file>
 
 <file path=".github/workflows/gh-pages.yml">
@@ -2937,42 +3124,457 @@ module.exports = {
 };
 </file>
 
+<file path="simple-chat-backend/data/chats.js">
+const getCurrTime = () => new Date().toLocaleTimeString()
+
+// Начальные данные для чатов
+const initialChats = [
+  {
+    id: 0,
+    name: 'Shrek',
+    avatar: 'https://avatar.iran.liara.run/public/boy',
+    unreadMessages: 99,
+    messages: [
+      {
+        isOurs: false,
+        text: 'hello1!jhgjhjh',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello2!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello3!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello4!',
+        time: getCurrTime(),
+      },
+    ]
+  },
+  {
+    id: 1,
+    name: 'Donkey',
+    avatar: 'https://avatar.iran.liara.run/public/boy',
+    unreadMessages: 99,
+    messages: [
+      {
+        isOurs: false,
+        text: 'hello5!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello6!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello7!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello8!',
+        time: getCurrTime(),
+      },
+    ]
+  },
+  {
+    id: 2,
+    name: 'Swamp',
+    avatar: 'https://avatar.iran.liara.run/public/boy',
+    unreadMessages: 228,
+    messages: [
+      {
+        isOurs: false,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+    ]
+  },
+  {
+    id: 3,
+    name: 'Fiona',
+    avatar: 'https://avatar.iran.liara.run/public/girl',
+    unreadMessages: 0,
+    messages: [
+      {
+        isOurs: false,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+    ]
+  },
+]
+
+let chats = [...initialChats];
+
+
+const getChats = () => {
+  // console.log('это я', chats)
+  return chats;
+};
+
+const getChatsList = () => {
+  return chats.map(chat => ({
+    id: chat.id,
+    name: chat.name,
+    avatar: chat.avatar,
+    unreadMessages: chat.unreadMessages,
+    lastMessage: chat.messages.length > 0 
+      ? chat.messages[chat.messages.length - 1]
+      : { text: 'Нет сообщений', time: '00:00', isOurs: false }
+  }));
+};
+
+// Добавить сообщение в чат
+const addMessageToChat = (id, text) => {
+  const chat = chats.find(chatItem => chatItem.id === id);
+  
+  if (chat) {
+    chat.messages.push({
+      isOurs: true,
+      text,
+      time: getCurrTime(),
+    });
+
+    chat.unreadMessages += 1;
+
+    // Сохраняем обратно в localStorage
+    console.log(`✅ Сообщение добавлено в чат ${id}: "${text}"`);
+  }
+  
+  return getChats(); // Возвращаем обновленные данные
+};
+
+const addMyVoiceMessageToChat = (id, voiceData) => {
+  const chat = chats.find(chatItem => chatItem.id === id);
+  
+  if (chat) {
+    chat.messages.push({
+      isOurs: true,
+      type: "voice", // Добавляем тип для фильтрации
+      text: "[Голосовое сообщение]",
+      // Выносим voiceMessageObj на верхний уровень:
+      voiceMessageObj: {  
+        voice_text: voiceData.file,       // URL файла
+        duration: voiceData.duration,
+        mime: voiceData.mime || 'audio/webm'
+      },
+      time: getCurrTime(),
+    });
+
+    chat.unreadMessages += 1;
+    console.log(`🎤 Голосовое сообщение сохранено: ${voiceData.file}`);
+  }
+  
+  return getChats();
+};
+
+
+const deleteMessageFromChat = (id, messageId) => {
+  const chat = chats.find(chatItem => chatItem.id === id);
+  
+  if (chat) {
+    chat.messages = chat.messages.filter((msg, index) => index !== messageId);
+
+    console.log(`✅ Сообщение с id ${messageId} удалено из чата ${id}`);
+  }
+  
+  return getChats(); 
+}
+
+const resetChats = () => {
+  chats = [...initialChats];
+  return getChats();
+};
+
+export {
+  getChats,
+  getChatsList, 
+  addMessageToChat,
+  addMyVoiceMessageToChat,
+  deleteMessageFromChat,
+  resetChats
+};
+</file>
+
+<file path="simple-chat-backend/server.js">
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+
+
+import express from 'express'; //Обрабатывает HTTP запросы (GET, POST, PUT, DELETE)
+import cors from 'cors'; // (Cross-Origin Resource Sharing) - разрешает запросы между разными доменами
+import { getChats, getChatsList, addMessageToChat, addMyVoiceMessageToChat, deleteMessageFromChat} from './data/chats.js';
+
+const app = express(); 
+const PORT = 3001;
+
+// ⭐ MIDDLEWARE - обязательные штуки
+app.use(cors()); // Разрешаем запросы с фронтенда
+app.use(express.json()); // Позволяем читать JSON из тела запроса
+
+const uploadDir = './uploads/voice';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname) || '.webm';
+    cb(null, Date.now() + ext);
+  }
+});
+
+const upload = multer({ storage });
+
+
+app.get('/api/chats', (req, res) => {
+  console.log('📨 Получен запрос на /api/chats');
+  const chats = getChats();
+  res.json(chats); // Отправляем данные обратно
+});
+
+app.get('/api/chats-list', (req, res) => {
+  console.log('📨 Получен запрос на /api/chats-list');
+  const chatsList = getChatsList();
+  res.json(chatsList);
+});
+
+
+app.post('/api/chats/:id/messages', (req, res) => {
+  const chatId = parseInt(req.params.id);
+  const { text } = req.body;
+  
+  console.log(`📨 Получено сообщение для чата ${chatId}: "${text}"`);
+  
+  const updatedChats = addMessageToChat(chatId, text);
+  res.json({ success: true, chats: updatedChats });
+});
+
+app.post('/api/chats/:id/voice-upload', upload.single('voice'), (req, res) => {
+  const chatId = parseInt(req.params.id);
+  const file = req.file;
+  const { duration } = req.body;
+
+  if (!file) {
+    return res.status(400).json({ error: 'Файл не загружен' });
+  }
+
+  console.log(`📥 Загружен файл голосового сообщения: ${file.filename}`);
+
+  const fileUrl = `/uploads/voice/${file.filename}`;
+
+  const updatedChats = addMyVoiceMessageToChat(chatId, {
+    file: fileUrl,
+    duration: Number(duration),
+  });
+
+  res.json({ success: true, chats: updatedChats });
+});
+
+app.use('/uploads', express.static('uploads'));
+
+
+
+app.delete('/api/chats/:id/messages', (req, res) => {
+  const chatId = parseInt(req.params.id);
+  const { messageId } = req.body;
+
+  console.log(`📨 Получен запрос на удаление сообщения ${messageId} из чата ${chatId}`);
+  
+  const updatedChats = deleteMessageFromChat(chatId, messageId);
+  res.json({ success: true, chats: updatedChats });
+});
+
+
+app.listen(PORT, () => {
+  console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
+  console.log('📡 Доступные эндпоинты:');
+  console.log('   GET  http://localhost:3001/api/chats');
+  console.log('   GET  http://localhost:3001/api/chats-list'); 
+  console.log('   POST http://localhost:3001/api/chats/0/messages');
+});
+</file>
+
+<file path="simple-chat-react/src/api/chatsAPI.js">
+const API_BASE_URL = 'http://localhost:3001/api';
+
+export const getChats = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/chats`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Ошибка при загрузке чатов:', error);
+    throw error;
+  }
+};
+
+export const getChatsList = async () => {
+  try{
+    const response = await fetch(`${API_BASE_URL}/chats-list`);
+    if (!response.ok){
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    return response.json();
+  } catch(error) {
+    console.error('Ошибка при загрузке списка чатов:', error);
+    throw error
+  }
+}
+
+export const addMyMessageToChat = async (chatId, text) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/chats/${chatId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text }),
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    return response.json()
+  } catch (error) {
+    console.error('❌ Ошибка при отправке текстового сообщения:', error)
+    throw error
+  }
+}
+
+export const addMyVoiceMessageToChat = async (chatId, voiceMessageObj) => {
+  try {
+    const formData = new FormData();
+    formData.append('voice', voiceMessageObj.file); // Ключ 'voice' должен совпадать с multer.single('voice')
+    formData.append('duration', voiceMessageObj.duration || 0);
+    
+    const response = await fetch(`${API_BASE_URL}/chats/${chatId}/voice-upload`, {
+      method: 'POST',
+      body: formData, // Не нужно headers для FormData
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return response.json();
+  } catch (error) {
+    console.error('❌ Ошибка при отправке голосового сообщения:', error);
+    throw error;
+  }
+};
+
+
+export const deleteMessageFromChat = async (chatId, messageId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/chats/${chatId}/messages`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ messageId }),
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    return response.json()
+    
+  } catch (error) {
+    console.error('❌ Ошибка при удалении текстового сообщения:', error)
+    throw error
+  }
+}
+</file>
+
 <file path="simple-chat-react/src/api/index.js">
 export * from './chatsAPI';
 </file>
 
 <file path="simple-chat-react/src/components/ChatInput/ChatInput.jsx">
+// ChatInput.jsx - УПРОЩАЕМ
 import { useState } from "react";
+import { VoiceInput } from '../../components/VoiceInput/VoiceInput';
 import './ChatInput.scss'
 
-export const ChatInput = ({SendMessage}) => {
-   const [message, setMessage] = useState('');
+export const ChatInput = ({ SendMessage, currentChatId, setChats }) => { 
+  const [message, setMessage] = useState('');
 
-    const SubmitInput = (event) => {
-      event.preventDefault();
-      if (message.trim()) {
-      SendMessage(message); 
+  const SubmitInput = (event) => {
+    event.preventDefault();
+    if (message.trim()) {
+      SendMessage({
+        type: "text",
+        text: message
+      });
       setMessage('');
-      console.log("ADD",message);
+      console.log("ADD", message);
     }
   };
-    
 
-
-
-  return(
+  return (
     <form className="Chat-form" onSubmit={SubmitInput}>
       <input 
-      className="Chat-form__input" 
-      type="text"
-      value={message}
-      onChange={(event) => setMessage(event.target.value)}
+        className="Chat-form__input" 
+        type="text"
+        value={message}
+        onChange={(event) => setMessage(event.target.value)}
+        placeholder="Введите сообщение"
       />
-      <button className="Chat-form__button" type='submit'>
-        <img  src='/inputBtn.svg' alt="Send" width="40px" height="50px"/>
-      </button>
+      {message.trim().length > 0 ? (
+        <button className="Chat-form__button" type='submit'>
+          <img src='/inputBtn.svg' alt="Send" width="30px" height="35px"/>
+        </button>
+      ) : (
+        <VoiceInput currentChatId={currentChatId} setChats={setChats}/> 
+      )}
     </form>
-    
   );
 }
 </file>
@@ -3008,83 +3610,351 @@ export const ChatList = ({ ChatsLog}) => {
 }
 </file>
 
-<file path="simple-chat-react/src/pages/PageChat/PageChat.jsx">
-import { useRef, useEffect } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+<file path="simple-chat-react/src/components/Message/Message.jsx">
+import './Message.scss'
+import { useState, useEffect, useRef } from 'react';
 
-import {Message} from '../../components/Message/Message';
-import { ChatInput } from '../../components/ChatInput/ChatInput';
-import {addMyMessageToChat, deleteMessageFromChat} from '../../api/chatsAPI.js'
-import './PageChat.scss';
+export const Message = ({isOurs, text, voiceMessageObj, time, messageId, deleteMessage}) => {
+  const [contextMenuVisible, setContextMenuVisible] = useState({
+    visible: false,
+    x: 0,
+    y: 0
+  });
 
+  const menuRef = useRef(null);
+  const messageRef = useRef(null);
 
+  // 🔍 ДЛЯ ОТЛАДКИ
+  console.log('🔍 Message DEBUG:');
+  console.log('text:', text);
+  console.log('voiceMessageObj:', voiceMessageObj);
+  console.log('time:', time);
+  console.log('messageId:', messageId);
+  console.log('---');
 
-export const PageChat = ({selectChatAPI, setChats}) => {
-  const { chatId } = useParams();
-  const id = parseInt(chatId, 10);
-
-  const activeChatData = selectChatAPI.find(chat => chat.id === id);
-
-  const messagesContainerRef = useRef(null);
-
-  const scrollToBottom = () => {
-  const container = messagesContainerRef.current;
-    if (container) {
-      container.scrollTop = container.scrollHeight;
-    }
+  // Функция для определения, это голосовое сообщение
+  const isVoiceMessage = () => {
+    // ВАЖНО: Проверяем, пришел ли voiceMessageObj как параметр
+    // НО: в данных с сервера voiceMessageObj будет внутри объекта message
+    // Так что проверяем оба варианта
+    return !!voiceMessageObj || text === "[Голосовое сообщение]";
   };
 
-  const deleteMessage = async (messageId) => {
-    console.log('Delete message triggered', messageId, activeChatData.messages);
-    try{
-      const updatedChats = await deleteMessageFromChat(id, messageId);
-      setChats(updatedChats.chats); 
-    } catch (error){
-      console.error('Ошибка при удалении сообщения:', error);
+  // Функция для получения URL аудио - УПРОЩЕННАЯ версия
+  const getAudioUrl = () => {
+    if (!voiceMessageObj) {
+      console.log('❌ voiceMessageObj пустой');
+      return '';
     }
-  }
+    
+    console.log('✅ voiceMessageObj:', voiceMessageObj);
+    
+    // Если voiceMessageObj - это строка (URL)
+    if (typeof voiceMessageObj === 'string') {
+      const url = voiceMessageObj.startsWith('/') 
+        ? `http://localhost:3001${voiceMessageObj}`
+        : voiceMessageObj;
+      console.log('📌 Строковый URL:', url);
+      return url;
+    }
+    
+    // Если voiceMessageObj - это объект
+    if (typeof voiceMessageObj === 'object') {
+      // Пробуем все возможные поля
+      const possibleFields = ['file', 'voice_text', 'audioUrl', 'url'];
+      for (const field of possibleFields) {
+        if (voiceMessageObj[field]) {
+          const url = voiceMessageObj[field].startsWith('/')
+            ? `http://localhost:3001${voiceMessageObj[field]}`
+            : voiceMessageObj[field];
+          console.log(`📌 Нашли поле ${field}:`, url);
+          return url;
+        }
+      }
+    }
+    
+    console.log('❌ Не удалось извлечь URL');
+    return '';
+  };
+
+  const handleContextMenu = (event) => {
+    event.preventDefault();
+    setContextMenuVisible({
+      visible: true,
+      x: event.pageX,
+      y: event.pageY
+    });
+  };
+
+  const handleMenuMouseLeave = () => {
+    setContextMenuVisible({ visible: false, x: 0, y: 0 });
+  };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [activeChatData?.messages, chatId]);
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)){
+        setContextMenuVisible({ visible: false, x: 0, y: 0 });
+      }
+    };
 
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
+  const NormalTime = time?.slice?.(0,5) || '00:00';
+  
+  // Проверяем, это голосовое сообщение
+  const isVoice = isVoiceMessage();
+  const audioUrl = getAudioUrl();
+  
+  console.log('🎯 Итог: isVoice =', isVoice, 'audioUrl =', audioUrl);
 
-  const SendMessage = async (messageText) => {
-    try {
-    const updatedChats = await addMyMessageToChat(id, messageText);
-    setChats(updatedChats.chats);
-    } catch (error) {
-    console.error('Ошибка отправки:', error);
-    }
-  }
-
-  if (!activeChatData) {
+  // ЕСЛИ voiceMessageObj существует ИЛИ текст "[Голосовое сообщение]" - показываем аудио
+  if (isVoice) {
     return (
-      <div className='Chat-container'>
-        <h2 className='Chat-container__selectTitle'>Выберите чат слева</h2>
+      <div
+        ref={messageRef}
+        className={`messageContainer ${isOurs ? 'messageContainer--ours' : 'messageContainer--theirs'}`}
+        onContextMenu={handleContextMenu}
+        onMouseLeave={handleMenuMouseLeave}
+      >
+        <div className="voice-message-wrapper">
+          {audioUrl ? (
+            <audio 
+              className="messageContainer__audio" 
+              controls 
+              preload="metadata"
+              src={audioUrl}
+              style={{ width: '250px' }}
+            />
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '24px' }}>🎤</span>
+              <span>{text || 'Голосовое сообщение'}</span>
+            </div>
+          )}
+        </div>
+        
+        <span className="messageContainer__time">{NormalTime}</span>
+
+        {/* Контекстное меню */}
+        {contextMenuVisible.visible && (
+          <div
+            ref={menuRef}
+            className='messageContainer__contextMenu'
+            style={{
+              top: contextMenuVisible.y,
+              left: contextMenuVisible.x
+            }}
+          >
+            <ul className='messageContainer__contextMenu-list'>
+              <li 
+                className='messageContainer__contextMenu-item' 
+                onClick={() => {
+                  deleteMessage(messageId);
+                  setContextMenuVisible({ visible: false, x: 0, y: 0 });
+                }}
+              >
+                Удалить сообщение
+              </li>
+            </ul>
+          </div>
+        )}
       </div>
     );
   }
-  else {
-  const MessageList = activeChatData.messages.map((message, index) => (
-      <li 
-      key={index}>
-        <Message isOurs={message.isOurs} text={message.text} time={message.time} messageId={index} deleteMessage={deleteMessage}></Message>
-      </li>
-    )
-  );
 
-
+  // 📝 Текстовое сообщение (НЕ голосовое)
   return (
-    <ul className='Chat-container' >
-      <div className="scroll-container" ref={messagesContainerRef}>
-      {MessageList}
-      </div>
-      <ChatInput SendMessage={SendMessage}></ChatInput>
-    </ul>
+    <div
+      ref={messageRef}
+      className={`messageContainer ${isOurs ? 'messageContainer--ours' : 'messageContainer--theirs'}`}
+      onContextMenu={handleContextMenu}
+      onMouseLeave={handleMenuMouseLeave}
+    >
+      <span className="messageContainer__text">{text}</span>
+      <span className="messageContainer__time">{NormalTime}</span>
+
+      {/* Контекстное меню */}
+      {contextMenuVisible.visible && (
+        <div
+          ref={menuRef}
+          className='messageContainer__contextMenu'
+          style={{
+            top: contextMenuVisible.y,
+            left: contextMenuVisible.x
+          }}
+        >
+          <ul className='messageContainer__contextMenu-list'>
+            <li 
+              className='messageContainer__contextMenu-item'
+              onClick={() => {
+                navigator.clipboard.writeText(text);
+                setContextMenuVisible({ visible: false, x: 0, y: 0 });
+              }}
+            >
+              Копировать текст
+            </li>
+            <li 
+              className='messageContainer__contextMenu-item' 
+              onClick={() => {
+                deleteMessage(messageId);
+                setContextMenuVisible({ visible: false, x: 0, y: 0 });
+              }}
+            >
+              Удалить сообщение
+            </li>
+            <li className='messageContainer__contextMenu-item' onClick={()=>{
+              console.log(messageRef);
+            }}>Редактировать сообщение</li>
+          </ul>
+        </div>
+      )}
+    </div>
   );
+};
+</file>
+
+<file path="simple-chat-react/src/components/Message/Message.scss">
+.messageContainer{
+  box-sizing: border-box;
+  border-radius: 20px;
+  padding: 10px 15px 2px 15px;
+  display: flex;
+  flex-direction: column;
+  max-width: 60%;
+  margin-right: 5px;
+
+  &--ours{
+    background-color: rgb(187, 209, 233);
+    margin-left: auto;
   }
+
+  &--theirs{
+    background-color: rgb(197, 198, 198);
+    margin-right: auto;
+  }
+
+  &__text{
+    text-align:start;
+    font-size: 30px;
+    word-wrap: break-word;      /* ← ПЕРЕНОС СЛОВ */
+    word-break: break-word;     /* ← ЛОМАЕМ СЛОВА */
+    overflow-wrap: anywhere; 
+    min-width: 0;
+  }
+
+  &__time{
+    font-size: 20px;
+    align-self: flex-end;
+    text-align: center;
+    white-space: nowrap;
+  }
+}
+
+.messageContainer__contextMenu{
+  background-color: white;
+  border-radius: 10px;
+  position: fixed;
+  border: 1px solid black;
+  transform: 0.6s ease-in-out;
+
+}
+
+
+.messageContainer__contextMenu-list{
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+  text-align: start;
+}
+
+.messageContainer__contextMenu-item{
+  padding: 5px 10px;
+  cursor: pointer;
+
+  &:hover{
+    background-color: lightgray;
+  }
+}
+
+
+
+.messageContainer {
+  box-sizing: border-box;
+  border-radius: 20px;
+  padding: 10px 15px 2px 15px;
+  display: flex;
+  flex-direction: column;
+  max-width: 60%;
+  margin-right: 5px;
+
+  &--ours{
+    background-color: rgb(187, 209, 233);
+    margin-left: auto;
+  }
+
+  &--theirs{
+    background-color: rgb(197, 198, 198);
+    margin-right: auto;
+  }
+
+  &__text{
+    text-align:start;
+    font-size: 30px;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
+  &__time{
+    font-size: 20px;
+    align-self: flex-end;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  &__audio {
+    width: 250px;
+    height: 40px;
+    margin: 5px 0;
+  }
+}
+
+.messageContainer__contextMenu{
+  background-color: white;
+  border-radius: 10px;
+  position: fixed;
+  border: 1px solid black;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.messageContainer__contextMenu-list{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: start;
+}
+
+.messageContainer__contextMenu-item{
+  padding: 8px 15px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+
+  &:hover{
+    background-color: #f0f0f0;
+  }
+}
+
+.voice-message-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 </file>
 
@@ -3118,6 +3988,7 @@ export const PageChatList = ({ ChatsLog}) => {
   display: grid;
   grid-template-rows: 1fr;
   grid-template-columns: 1fr 1fr;
+  gap:20px;
 }
 </file>
 
@@ -3165,39 +4036,6 @@ createRoot(document.getElementById('root')).render(
 </html>
 </file>
 
-<file path="simple-chat-react/package.json">
-{
-  "name": "simple-chat-react",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-router-dom": "^7.9.6"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.36.0",
-    "@types/react": "^19.1.16",
-    "@types/react-dom": "^19.1.9",
-    "@vitejs/plugin-react": "^5.0.4",
-    "eslint": "^9.36.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.22",
-    "globals": "^16.4.0",
-    "sass-embedded": "^1.93.3",
-    "typescript": "^5.9.3",
-    "vite": "^7.1.7"
-  }
-}
-</file>
-
 <file path="simple-chat/src/index.html">
 <!DOCTYPE html>
 <html lang="en">
@@ -3210,6 +4048,88 @@ createRoot(document.getElementById('root')).render(
     <span> index</span>
 </body>
 </html>
+</file>
+
+<file path="simple-chat-react/src/pages/PageChat/PageChat.jsx">
+// PageChat.jsx - УПРОЩАЕМ
+import { useRef, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { Message } from '../../components/Message/Message';
+import { ChatInput } from '../../components/ChatInput/ChatInput';
+import { addMyMessageToChat, deleteMessageFromChat } from '../../api/chatsAPI.js';
+import './PageChat.scss';
+
+export const PageChat = ({ selectChatAPI, setChats }) => {
+  const { chatId } = useParams();
+  const id = parseInt(chatId, 10);
+  const activeChatData = selectChatAPI.find(chat => chat.id === id);
+  const messagesContainerRef = useRef(null);
+
+  const scrollToBottom = () => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  };
+
+  const deleteMessage = async (messageId) => {
+    try {
+      const updatedChats = await deleteMessageFromChat(id, messageId);
+      setChats(updatedChats.chats); 
+    } catch (error) {
+      console.error('Ошибка при удалении сообщения:', error);
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [activeChatData?.messages, id]);
+
+  // Упрощаем SendMessage - теперь только для текста
+  const SendMessage = async (messageObj) => {
+    if (messageObj.type === "text") {
+      try {
+        const updatedChats = await addMyMessageToChat(id, messageObj.text);
+        setChats(updatedChats.chats);
+      } catch (error) {
+        console.error('Ошибка отправки:', error);
+      }
+    }
+    // Голосовые сообщения теперь обрабатываются в VoiceInput
+  };
+
+  if (!activeChatData) {
+    return (
+      <div className='Chat-container'>
+        <h2 className='Chat-container__selectTitle'>Выберите чат слева</h2>
+      </div>
+    );
+  }
+
+  const MessageList = activeChatData.messages.map((message, index) => (
+    <li key={index}>
+      <Message 
+        isOurs={message.isOurs} 
+        text={message.text} 
+        voiceMessageObj={message.voiceMessageObj || null} 
+        time={message.time} 
+        messageId={index} 
+        deleteMessage={deleteMessage}
+      />
+    </li>
+  ));
+
+  return (
+    <div className='Chat-container'>
+      <div className="scroll-container" ref={messagesContainerRef}>
+        {activeChatData.messages.length === 0 ? (
+          <h2 className='Chat-container__selectTitle'>Нет сообщений</h2>
+        ) : MessageList}
+      </div>
+      <ChatInput SendMessage={SendMessage} currentChatId={id} setChats={setChats} />
+    </div>
+  );
+};
 </file>
 
 <file path="simple-chat-react/src/App.jsx">
@@ -3274,6 +4194,39 @@ useEffect(() => {
 }
 
 export default App
+</file>
+
+<file path="simple-chat-react/package.json">
+{
+  "name": "simple-chat-react",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.6"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.22",
+    "globals": "^16.4.0",
+    "sass-embedded": "^1.93.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.7"
+  }
+}
 </file>
 
 <file path="README.md">

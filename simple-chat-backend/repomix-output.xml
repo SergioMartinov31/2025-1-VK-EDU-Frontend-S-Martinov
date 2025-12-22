@@ -1,0 +1,388 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+data/
+  chats.js
+package.json
+server.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="data/chats.js">
+const getCurrTime = () => new Date().toLocaleTimeString()
+
+// Начальные данные для чатов
+const initialChats = [
+  {
+    id: 0,
+    name: 'Shrek',
+    avatar: 'https://avatar.iran.liara.run/public/boy',
+    unreadMessages: 99,
+    messages: [
+      {
+        isOurs: false,
+        text: 'hello1!jhgjhjh',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello2!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello3!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello4!',
+        time: getCurrTime(),
+      },
+    ]
+  },
+  {
+    id: 1,
+    name: 'Donkey',
+    avatar: 'https://avatar.iran.liara.run/public/boy',
+    unreadMessages: 99,
+    messages: [
+      {
+        isOurs: false,
+        text: 'hello5!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello6!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello7!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello8!',
+        time: getCurrTime(),
+      },
+    ]
+  },
+  {
+    id: 2,
+    name: 'Swamp',
+    avatar: 'https://avatar.iran.liara.run/public/boy',
+    unreadMessages: 228,
+    messages: [
+      {
+        isOurs: false,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+    ]
+  },
+  {
+    id: 3,
+    name: 'Fiona',
+    avatar: 'https://avatar.iran.liara.run/public/girl',
+    unreadMessages: 0,
+    messages: [
+      {
+        isOurs: false,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+      {
+        isOurs: true,
+        text: 'hello!',
+        time: getCurrTime(),
+      },
+    ]
+  },
+]
+
+let chats = [...initialChats];
+
+// Получить чаты
+const getChats = () => {
+  // console.log('это я', chats)
+  return chats;
+};
+
+const getChatsList = () => {
+  return chats.map(chat => ({
+    id: chat.id,
+    name: chat.name,
+    avatar: chat.avatar,
+    unreadMessages: chat.unreadMessages,
+    lastMessage: chat.messages.length > 0 
+      ? chat.messages[chat.messages.length - 1]
+      : { text: 'Нет сообщений', time: '00:00', isOurs: false }
+  }));
+};
+
+// Добавить сообщение в чат
+const addMessageToChat = (id, text) => {
+  const chat = chats.find(chatItem => chatItem.id === id);
+  
+  if (chat) {
+    chat.messages.push({
+      isOurs: true,
+      text,
+      time: getCurrTime(),
+    });
+
+    chat.unreadMessages += 1;
+
+    // Сохраняем обратно в localStorage
+    console.log(`✅ Сообщение добавлено в чат ${id}: "${text}"`);
+  }
+  
+  return getChats(); // Возвращаем обновленные данные
+};
+
+const addMyVoiceMessageToChat = (id, voiceData) => {
+  const chat = chats.find(chatItem => chatItem.id === id);
+  
+  if (chat) {
+    chat.messages.push({
+      isOurs: true,
+      type: "voice", // Добавляем тип для фильтрации
+      text: "[Голосовое сообщение]",
+      // Выносим voiceMessageObj на верхний уровень:
+      voiceMessageObj: {  
+        voice_text: voiceData.file,       // URL файла
+        duration: voiceData.duration,
+        mime: voiceData.mime || 'audio/webm'
+      },
+      time: getCurrTime(),
+    });
+
+    chat.unreadMessages += 1;
+    console.log(`🎤 Голосовое сообщение сохранено: ${voiceData.file}`);
+  }
+  
+  return getChats();
+};
+
+
+const deleteMessageFromChat = (id, messageId) => {
+  const chat = chats.find(chatItem => chatItem.id === id);
+  
+  if (chat) {
+    chat.messages = chat.messages.filter((msg, index) => index !== messageId);
+
+    console.log(`✅ Сообщение с id ${messageId} удалено из чата ${id}`);
+  }
+  
+  return getChats(); 
+}
+
+const resetChats = () => {
+  chats = [...initialChats];
+  return getChats();
+};
+
+export {
+  getChats,
+  getChatsList, 
+  addMessageToChat,
+  addMyVoiceMessageToChat,
+  deleteMessageFromChat,
+  resetChats
+};
+</file>
+
+<file path="package.json">
+{
+  "name": "simple-chat-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
+}
+</file>
+
+<file path="server.js">
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+
+
+import express from 'express'; //Обрабатывает HTTP запросы (GET, POST, PUT, DELETE)
+import cors from 'cors'; // (Cross-Origin Resource Sharing) - разрешает запросы между разными доменами
+import { getChats, getChatsList, addMessageToChat, addMyVoiceMessageToChat, deleteMessageFromChat} from './data/chats.js';
+
+const app = express(); 
+const PORT = 3001;
+
+// ⭐ MIDDLEWARE - обязательные штуки
+app.use(cors()); // Разрешаем запросы с фронтенда
+app.use(express.json()); // Позволяем читать JSON из тела запроса
+
+const uploadDir = './uploads/voice';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname) || '.webm';
+    cb(null, Date.now() + ext);
+  }
+});
+
+const upload = multer({ storage });
+
+
+app.get('/api/chats', (req, res) => {
+  console.log('📨 Получен запрос на /api/chats');
+  const chats = getChats();
+  res.json(chats); // Отправляем данные обратно
+});
+
+app.get('/api/chats-list', (req, res) => {
+  console.log('📨 Получен запрос на /api/chats-list');
+  const chatsList = getChatsList();
+  res.json(chatsList);
+});
+
+
+app.post('/api/chats/:id/messages', (req, res) => {
+  const chatId = parseInt(req.params.id);
+  const { text } = req.body;
+  
+  console.log(`📨 Получено сообщение для чата ${chatId}: "${text}"`);
+  
+  const updatedChats = addMessageToChat(chatId, text);
+  res.json({ success: true, chats: updatedChats });
+});
+
+app.post('/api/chats/:id/voice-upload', upload.single('voice'), (req, res) => {
+  const chatId = parseInt(req.params.id);
+  const file = req.file;
+  const { duration } = req.body;
+
+  if (!file) {
+    return res.status(400).json({ error: 'Файл не загружен' });
+  }
+
+  console.log(`📥 Загружен файл голосового сообщения: ${file.filename}`);
+
+  const fileUrl = `/uploads/voice/${file.filename}`;
+
+  const updatedChats = addMyVoiceMessageToChat(chatId, {
+    file: fileUrl,
+    duration: Number(duration),
+  });
+
+  res.json({ success: true, chats: updatedChats });
+});
+
+app.use('/uploads', express.static('uploads'));
+
+
+
+app.delete('/api/chats/:id/messages', (req, res) => {
+  const chatId = parseInt(req.params.id);
+  const { messageId } = req.body;
+
+  console.log(`📨 Получен запрос на удаление сообщения ${messageId} из чата ${chatId}`);
+  
+  const updatedChats = deleteMessageFromChat(chatId, messageId);
+  res.json({ success: true, chats: updatedChats });
+});
+
+
+app.listen(PORT, () => {
+  console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
+  console.log('📡 Доступные эндпоинты:');
+  console.log('   GET  http://localhost:3001/api/chats');
+  console.log('   GET  http://localhost:3001/api/chats-list'); 
+  console.log('   POST http://localhost:3001/api/chats/0/messages');
+});
+</file>
+
+</files>

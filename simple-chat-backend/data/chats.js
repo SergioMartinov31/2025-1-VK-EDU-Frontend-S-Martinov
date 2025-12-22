@@ -1,3 +1,13 @@
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = 'my-super-secret-key-change-in-production';
+
+
+const users = [];
+
+let userIdCounter = 1;
+
 const getCurrTime = () => new Date().toLocaleTimeString()
 
 // Начальные данные для чатов
@@ -116,10 +126,170 @@ const initialChats = [
   },
 ]
 
+
 let chats = [...initialChats];
 
-// Получить чаты
+
+export const registerUser = async (username, password) => {
+  try {
+    console.log(`🔐 Попытка регистрации: ${username}`);
+    
+    // Проверяем, существует ли пользователь
+    const existingUser = users.find(u => u.username === username);
+    if (existingUser) {
+      return {
+        success: false,
+        error: 'Пользователь с таким именем уже существует'
+      };
+    }
+    
+    // Хешируем пароль
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
+    
+    // Создаём пользователя
+    const user = {
+      id: userIdCounter++,
+      username: username,
+      passwordHash: passwordHash,
+      createdAt: new Date()
+    };
+    
+    users.push(user);
+    console.log(`✅ Зарегистрирован пользователь: ${username} (ID: ${user.id})`);
+    
+    // Создаём JWT токен
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        username: user.username
+      },
+      JWT_SECRET,
+      { expiresIn: '24h' } // Токен живёт 24 часа
+    );
+    
+    return {
+      success: true,
+      token: token,
+      user: {
+        id: user.id,
+        username: user.username
+      }
+    };
+    
+  } catch (error) {
+    console.error('❌ Ошибка регистрации:', error);
+    return {
+      success: false,
+      error: 'Ошибка сервера при регистрации'
+    };
+  }
+};
+
+
+
+
+export const loginUser = async (username, password) => {
+  try {
+    console.log(`🔐 Попытка входа: ${username}`);
+    
+    // Ищем пользователя
+    const user = users.find(u => u.username === username);
+    
+    if (!user) {
+      return {
+        success: false,
+        error: 'Пользователь не найден'
+      };
+    }
+    
+    // Сравниваем пароль с хешем
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    
+    if (!isPasswordValid) {
+      return {
+        success: false,
+        error: 'Неверный пароль'
+      };
+    }
+    
+    // Создаём JWT токен
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        username: user.username
+      },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
+    console.log(`✅ Успешный вход: ${username} (ID: ${user.id})`);
+    
+    return {
+      success: true,
+      token: token,
+      user: {
+        id: user.id,
+        username: user.username
+      }
+    };
+    
+  } catch (error) {
+    console.error('❌ Ошибка входа:', error);
+    return {
+      success: false,
+      error: 'Ошибка сервера при входе'
+    };
+  }
+};
+
+export const verifyToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    return {
+      valid: true,
+      user: decoded
+    };
+  } catch (error) {
+    return {
+      valid: false,
+      error: error.message
+    };
+  }
+};
+
+export const getAllUsers = () => {
+  return users.map(user => ({
+    id: user.id,
+    username: user.username,
+    createdAt: user.createdAt
+  }));
+};
+
+export const getUserById = (userId) => {
+  return users.find(u => u.id === userId) || null;
+};
+
+
+const getToken = (username, password) => {
+  if(!tokensList[username]){
+    //надо вывести на фронт сообщение пользователю что пользователя с таким ником нет
+  } else{
+    // дальше надо проверить пароль наверное либо я в целом не очень понимаю как устроить этот объект с токенами 
+  }
+}
+
+const createToken = (username, password) => {
+  if(!tokensList[username]){
+    tokensList[username] = password;
+  } else{
+    //надо на фронт как-то передать ошибку что юзер с таким именем уже есть
+  }
+}
+
+
 const getChats = () => {
+  // console.log('это я', chats)
   return chats;
 };
 
@@ -155,6 +325,30 @@ const addMessageToChat = (id, text) => {
   return getChats(); // Возвращаем обновленные данные
 };
 
+const addMyVoiceMessageToChat = (id, voiceData) => {
+  const chat = chats.find(chatItem => chatItem.id === id);
+  
+  if (chat) {
+    chat.messages.push({
+      isOurs: true,
+      type: "voice", // Добавляем тип для фильтрации
+      text: "[Голосовое сообщение]",
+      // Выносим voiceMessageObj на верхний уровень:
+      voiceMessageObj: {  
+        voice_text: voiceData.file,       // URL файла
+        duration: voiceData.duration,
+        mime: voiceData.mime || 'audio/webm'
+      },
+      time: getCurrTime(),
+    });
+
+    chat.unreadMessages += 1;
+    console.log(`🎤 Голосовое сообщение сохранено: ${voiceData.file}`);
+  }
+  
+  return getChats();
+};
+
 
 const deleteMessageFromChat = (id, messageId) => {
   const chat = chats.find(chatItem => chatItem.id === id);
@@ -177,6 +371,9 @@ export {
   getChats,
   getChatsList, 
   addMessageToChat,
+  addMyVoiceMessageToChat,
   deleteMessageFromChat,
-  resetChats
+  resetChats,
+  getToken,
+  createToken
 };
