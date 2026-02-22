@@ -1,6 +1,6 @@
-// PageLogin.jsx
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { auth } from '../../features/auth'
 import './PageLogin.scss';
 
 export const PageLogin = ({ setIsAuthenticated, setCurrentUser }) => {
@@ -8,55 +8,17 @@ export const PageLogin = ({ setIsAuthenticated, setCurrentUser }) => {
   const [password, setPassword] = useState('')
   const [isLogin, setIsLogin] = useState(true)
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setError('')
-    setLoading(true)
-    
-    // Простая валидация
-    if (!username.trim() || !password.trim()) {
-      setError('Введите логин и пароль')
-      setLoading(false)
-      return
-    }
-
     try {
-      // Определяем endpoint в зависимости от режима
-      const endpoint = isLogin ? '/api/login' : '/api/register'
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      })
-      
-      const data = await response.json()
-
-      if (response.ok && data.success) {
-
-        localStorage.setItem('token', data.token)
-
-        if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user))
-          setCurrentUser(data.user) // передаём в App
-        }
-
-        setIsAuthenticated(true)
-        navigate('/')
-
-        console.log('✅ Авторизация успешна, токен сохранён')
-      } else {
-        setError(data.error || 'Произошла ошибка')
-      }
-      
+      const { user } = await auth({ isLogin, username, password });
+      setCurrentUser(user);
+      setIsAuthenticated(true);
+      navigate('/');
     } catch (err) {
-      // console.error('Ошибка запроса:', err)
-      setError('Ошибка соединения с сервером')
-    } finally {
-      setLoading(false)
+      setError(err.message);
     }
   }
 

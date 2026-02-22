@@ -1,13 +1,31 @@
 .Chat-container{
-  height: 80vh;
+  
+  height: 100%;
   display: flex;
   flex-direction: column;
-  margin-top: 40px;
+  // gap:20px;
+  // margin-top: 40px;
 
+  &__header{
+    height: 81px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 20px 0 20px;
+    border-bottom: 1px solid rgb(168, 164, 164);
+  }
+
+  &__chatTitle{
+    color: #000;
+    font-size: 26px;
+    font-weight: 400;
+  }
+  
 
   &__selectTitle{
-    margin-top: 70%;
-    margin-left: 80px;
+    margin-top: 35%;
+    // margin-left: 80px;
     color: grey;
     font-size: 30px;
     font-weight: 200;
@@ -19,13 +37,14 @@
 
 
 .scroll-container{
+  margin-top: 20px;
   height: 80vh;
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;
   list-style: none;
   flex-direction: column;
-  gap:30px;
+  // gap:30px;
 
   &::-webkit-scrollbar {
     width: 4px; // Тонкий скроллбар
@@ -43,3 +62,8 @@
 
 }
 
+.chat-avatar{
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}

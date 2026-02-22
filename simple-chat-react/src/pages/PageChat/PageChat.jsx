@@ -1,15 +1,17 @@
-// PageChat.jsx - УПРОЩАЕМ
 import { useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Message } from '../../components/Message/Message';
-import { ChatInput } from '../../components/ChatInput/ChatInput';
-import { addMyMessageToChat, deleteMessageFromChat } from '../../api/chatsAPI.js';
+import { Message } from '../../entities/message/Message';
+import { ChatInput } from '../../features/send-message/ui/ChatInput';
+import {deleteMessage} from '../../features/delete-message';
+import {sendMessage} from '../../features/send-message';
 import './PageChat.scss';
+import { config } from '../../shared/config/config';
 
-export const PageChat = ({ selectChatAPI, setChats }) => {
+export const PageChat = ({ selectChatAPI, setChats, setShowProfile }) => {
   const { chatId } = useParams();
   const id = parseInt(chatId, 10);
-  const activeChatData = selectChatAPI.find(chat => chat.id === id);
+
+  const activeChatData = selectChatAPI?.find(chat => chat.id === id);
   const messagesContainerRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -19,31 +21,33 @@ export const PageChat = ({ selectChatAPI, setChats }) => {
     }
   };
 
-  const deleteMessage = async (messageId) => {
-    try {
-      const updatedChats = await deleteMessageFromChat(id, messageId);
-      setChats(updatedChats.chats); 
-    } catch (error) {
-      console.error('Ошибка при удалении сообщения:', error);
-    }
-  };
+  const handleSendMessage = (messageObj) => {
+    sendMessage(id, messageObj, setChats);
+  }
+
+  const hendleDeleteMessage = (messageId) => {
+    deleteMessage(id, messageId, setChats);
+  }
+
+  const onVideoClick = () => {
+    console.log('onVideo');
+  }
+
+  const openProfile = () => {
+    setShowProfile(true);
+    console.log('openProfile');
+  }
+
+  if (!selectChatAPI) {
+    return <div className='Chat-container'>
+      <h2 className='Chat-container__selectTitle'>Загрузка чата...</h2>
+    </div>;
+  }
 
   useEffect(() => {
     scrollToBottom();
   }, [activeChatData?.messages, id]);
 
-  // Упрощаем SendMessage - теперь только для текста
-  const SendMessage = async (messageObj) => {
-    if (messageObj.type === "text") {
-      try {
-        const updatedChats = await addMyMessageToChat(id, messageObj.text);
-        setChats(updatedChats.chats);
-      } catch (error) {
-        console.error('Ошибка отправки:', error);
-      }
-    }
-    // Голосовые сообщения теперь обрабатываются в VoiceInput
-  };
 
   if (!activeChatData) {
     return (
@@ -61,24 +65,29 @@ export const PageChat = ({ selectChatAPI, setChats }) => {
         voiceMessageObj={message.voiceMessageObj || null} 
         time={message.time} 
         messageId={index} 
-        deleteMessage={deleteMessage}
+        deleteMessage={hendleDeleteMessage}
       />
     </li>
   ));
 
-  const onVideoClick = () => {
-    console.log('onVideo');
-  }
-
   return (
+    <>
     <div className='Chat-container'>
+      <div className='Chat-container__header' onClick={openProfile}>
+        <img 
+          src={`${config.API_URL}${activeChatData.avatar}`}
+          alt="Аватар чата" 
+          className="chat-avatar" 
+        />
+        <h2 className='Chat-container__chatTitle'>{activeChatData.name}</h2>
+      </div>
       <div className="scroll-container" ref={messagesContainerRef}>
         {activeChatData.messages.length === 0 ? (
           <h2 className='Chat-container__selectTitle'>Нет сообщений</h2>
         ) : MessageList}
       </div>
-      <ChatInput SendMessage={SendMessage} currentChatId={id} setChats={setChats} onVideoClick={onVideoClick} />
-      
+      <ChatInput SendMessage={handleSendMessage} currentChatId={id} setChats={setChats} onVideoClick={onVideoClick} />
     </div>
+    </>
   );
 };

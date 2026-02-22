@@ -1,0 +1,58 @@
+.Chat-Profile{
+  display: none;
+}
+
+.Chat-Profile-active{
+  display: flex;
+  border-left: 1px solid rgb(168, 164, 164);
+  flex-direction: column;
+  gap: 35px;
+  
+
+}
+
+.Chat-Profile__header{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 45px;
+  padding-left: 5px;
+  height: 81px;
+  border-bottom:1px solid rgb(168, 164, 164);
+}
+
+.Chat-Profile__closeButton{
+  color: #000;
+  text-align: center;
+  background-color: transparent;
+  font-size: 22px;
+  font-weight: 400;
+  padding: 14px 18px;
+}
+
+.Chat-Profile__closeButton:hover{
+  background-color: lightgray;
+  border-radius: 30px;
+
+}
+
+.Chat-Profile__title{
+  color: #000;
+  font-size: 25px;
+  font-weight: 500;
+}
+
+
+.Chat-Profile__info{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap:40px;
+}
+
+.Chat-Profile__name{
+  color: #000;
+  text-align: center;
+  font-size: 30px;
+}

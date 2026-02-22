@@ -2,12 +2,8 @@
 import Snowfall from 'react-snowfall'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import App from './app'
 import { BrowserRouter, HashRouter } from 'react-router-dom'
-
-import { Provider } from 'react-redux'
-import { store } from './store' // Импортируем магазин
 
 
 /**
@@ -24,11 +20,9 @@ const Router = useHash ? HashRouter : BrowserRouter
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Provider store={store}>
     <Router>
       <Snowfall color='#82C3D9'/>
       <App />
     </Router>
-    </Provider>
   </StrictMode>,
 )

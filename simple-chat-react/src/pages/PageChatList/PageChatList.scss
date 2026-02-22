@@ -1,0 +1,55 @@
+
+/* Простые стили для хедера */
+
+.PageChatList-container{
+  border-right: 1px solid rgb(168, 164, 164);
+}
+
+.PageChatList-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  height: 81px;
+  /* background: rgb(187, 209, 233); */
+  /* color: white; */
+  border-bottom: 1px solid rgb(168, 164, 164);
+}
+
+.PageChatList-header__userInfo {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.PageChatList__username {
+  color: #000;
+  font-weight: 400;
+  font-size: 26px;
+}
+
+
+
+.logout-btn {
+  padding: 14px 14px;
+  background: rgb(187, 209, 233);
+  font-size: 19px;
+  color: white;
+  font-weight: 400;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #bfbcbc;
+}
+

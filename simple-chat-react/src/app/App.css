@@ -1,0 +1,49 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+
+body, html {
+  background-color: rgba(97, 147, 172, 0.261);
+  background-color: white;
+  overscroll-behavior: none;
+}
+
+#root {
+  width: 100%;
+  height: 100vh;
+  /* padding: 20px;
+  padding-top: 0px;
+  padding-bottom: 0px; */
+  text-align: center;
+  background-color: white;
+}
+
+main{
+  height: 100%;
+}
+
+.pagesContainer{
+  height: calc(100% - 10px);
+  padding-top: 10px;;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr 2fr;
+  /* gap:20px; */
+}
+
+.pagesContainer > .login-page{
+  grid-column: 1 / 3;
+}
+
+.pagesContainer:has(.Chat-Profile-active){
+  grid-template-columns: 1fr 1.5fr 0.5fr;
+}
+
+.pagesContainer:has(.Chat-Profile){
+  grid-template-columns: 1fr 2fr;
+}
+
+
