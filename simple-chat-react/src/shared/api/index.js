@@ -1,1 +1,1 @@
-export * from './chatsAPI';
+export { request } from './request';

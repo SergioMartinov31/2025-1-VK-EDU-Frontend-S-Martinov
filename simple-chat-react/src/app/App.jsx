@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 import './App.css';
-import './index.css'
+import './index.css';
 
 import { PageChatList } from '../pages/PageChatList';
 import { PageChat } from '../pages/PageChat';
 import { PageLogin } from '../pages/PageLogin';
-import { ChatPriofile } from '../widgets/ChatProfile';
-import { useAuthSession } from '../shared/hooks/useAuthSession';
-import { useChats } from '../shared/hooks/useChats';
-import { useChatsPolling } from '../shared/hooks/useChatsPolling';
+import { ChatProfilePanel } from '../widgets/chat-profile-panel';
+import { useAuthSession } from './model/useAuthSession';
+import { useChats } from './model/useChats';
+import { useChatsPolling } from './model/useChatsPolling';
 
 function App() {
   const [showProfile, setShowProfile] = useState(false);
@@ -28,7 +28,7 @@ function App() {
   useChatsPolling({ isAuthenticated, setChats, interval: 5000 });
 
   if (authChecking) {
-    return <div className="loading-screen">Проверка авторизации...</div>;
+    return <div className='loading-screen'>Проверка авторизации...</div>;
   }
 
   if (!isAuthenticated) {
@@ -58,7 +58,12 @@ function App() {
             path='/'
             element={
               <>
-                <PageChatList ChatsLog={chats} currentUser={currentUser} />
+                <PageChatList
+                  ChatsLog={chats}
+                  currentUser={currentUser}
+                  setIsAuthenticated={setIsAuthenticated}
+                  setCurrentUser={setCurrentUser}
+                />
                 <div className='Chat-container'>
                   <h2 className='Chat-container__selectTitle'>Выберите чат слева</h2>
                 </div>
@@ -80,7 +85,7 @@ function App() {
                   setChats={setChats}
                   setShowProfile={setShowProfile}
                 />
-                <ChatPriofile
+                <ChatProfilePanel
                   selectChatAPI={chats}
                   showProfile={showProfile}
                   setShowProfile={setShowProfile}

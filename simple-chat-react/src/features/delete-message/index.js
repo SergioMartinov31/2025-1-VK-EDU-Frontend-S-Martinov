@@ -1,1 +1,1 @@
-export {deleteMessage} from './deleteMessage'
+export { deleteMessage } from './model/deleteMessage';

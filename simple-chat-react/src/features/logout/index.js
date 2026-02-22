@@ -1,1 +1,1 @@
-export {logout} from './logout'
+export { logout } from './model/logout';

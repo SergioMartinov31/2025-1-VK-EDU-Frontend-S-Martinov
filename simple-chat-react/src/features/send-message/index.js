@@ -1,1 +1,2 @@
- export {sendMessage} from './sendMessage'
+export { sendMessage } from './model/sendMessage';
+export { ChatInput } from './ui/ChatInput/ChatInput';

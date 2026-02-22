@@ -1,1 +1,1 @@
-export {PageChatList} from './PageChatList'
+export {PageChatList} from './ui/PageChatList'
