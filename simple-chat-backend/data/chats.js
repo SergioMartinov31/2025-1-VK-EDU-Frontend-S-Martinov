@@ -250,6 +250,7 @@ const getChats = (userId) => {
     return {
       id: chat.id,
       name: partner ? partner.username : 'Unknown',
+      partnerId: partner ? partner.id : null,
       avatar: partner ? partner.avatar : '/avatars/default.png',
       unreadMessages: chat.unreadMessages || 0,
       messages: formattedMessages
@@ -392,6 +393,7 @@ const resetChats = () => {
 export {
   getChats,
   getChatsList,
+  getChatById,
   addMessageToChat,
   addMyVoiceMessageToChat,
   deleteMessageFromChat,

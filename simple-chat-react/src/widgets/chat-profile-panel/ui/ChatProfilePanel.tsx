@@ -3,15 +3,20 @@ import type {Chat} from '../../../entities/chat';
 import { config } from '../../../shared/config';
 import './ChatProfilePanel.scss';
 
+import { useSelector, useDispatch } from 'react-redux'
+import type { RootState } from '../../../app/store/store';
+import { closePartnerProfile } from '../../../features/show-partner-profile/profileSlice'
+
 interface ChatProfilePanelProps {
   selectChatAPI: Chat[];
-  showProfile: boolean;
-  setShowProfile: (show: boolean) => void;
 }
 
-export const ChatProfilePanel = ({ selectChatAPI, showProfile, setShowProfile }: ChatProfilePanelProps) => {
+export const ChatProfilePanel = ({ selectChatAPI }: ChatProfilePanelProps) => {
   const { chatId } = useParams();
   const id = parseInt(chatId, 10);
+
+  const showProfilePartner = useSelector((state: RootState) => state.showProfilePartner.value);
+  const dispatch = useDispatch()
 
   if (!selectChatAPI) {
     return null;
@@ -20,9 +25,9 @@ export const ChatProfilePanel = ({ selectChatAPI, showProfile, setShowProfile }:
   const activeChatData = selectChatAPI.find((chat) => chat.id === id);
 
   return (
-    <div className={showProfile ? 'Chat-Profile-active' : 'Chat-Profile'}>
+    <div className={showProfilePartner ? 'Chat-Profile-active' : 'Chat-Profile'}>
       <div className='Chat-Profile__header'>
-        <button className='Chat-Profile__closeButton' onClick={() => setShowProfile(false)}>
+        <button className='Chat-Profile__closeButton' onClick={() => dispatch(closePartnerProfile())}>
           X
         </button>
         <h2 className='Chat-Profile__title'>Информация</h2>

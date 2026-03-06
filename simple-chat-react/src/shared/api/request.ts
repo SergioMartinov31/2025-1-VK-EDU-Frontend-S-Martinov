@@ -58,8 +58,8 @@ export const request = async <TResponse = unknown, TBody = unknown>(path: string
   if (!response.ok) {
     const message =
       typeof data === 'object' && data !== null && 'error' in data
-        ? ((data as ErrorPayload).error || `HTTP error! status: ${response.status}`)
-        : `HTTP error! status: ${response.status}`;
+        ? ((data as ErrorPayload).error || `HTTP ${response.status}: ${method} ${path}`)
+        : `HTTP ${response.status}: ${method} ${path}`;
     const error = new Error(message) as ApiError;
     error.status = response.status;
     error.payload = data;

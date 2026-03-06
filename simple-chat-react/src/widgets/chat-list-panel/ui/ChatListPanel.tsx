@@ -26,6 +26,7 @@ export const ChatListPanel = ({ ChatsLog }: ChatListPanelProps) => {
         >
           <ChatListItem
             id={chat.id}
+            partnerId={chat.partnerId}
             name={chat.name}
             avatar={chat.avatar}
             messages={chat.messages}

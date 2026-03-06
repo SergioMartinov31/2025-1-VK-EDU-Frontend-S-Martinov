@@ -1,320 +1,315 @@
+import http from 'http';
+import { Server } from 'socket.io';
+
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
-import { 
-  getChats, 
-  getChatsList, 
-  addMessageToChat, 
-  addMyVoiceMessageToChat, 
+
+import {
+  getChats,
+  getChatsList,
+  getChatById,
+  addMessageToChat,
+  addMyVoiceMessageToChat,
   deleteMessageFromChat,
   registerUser,
   loginUser,
   verifyToken,
-  getAllUsers
+  getAllUsers,
 } from './data/chats.js';
 
-const app = express(); 
+const app = express();
 const PORT = 3001;
 
-// ⭐ MIDDLEWARE
+const onlineUsers = new Set(); // {1, 2, 3} - кто онлайн - Socket.user.id
+
+// ============ HTTP + SOCKET SERVER ============
+const httpServer = http.createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: ['http://localhost:5173'],
+    credentials: true,
+  },
+  transports: ['websocket', 'polling'],
+});
+
+// helper: отправить актуальные чаты конкретному пользователю
+const emitChatsSyncToUser = (userId) => {
+  const chats = getChats(userId);
+  io.to(`user:${userId}`).emit('chats:sync', chats);
+};
+
+// ============ MIDDLEWARE ============
 app.use(cors());
 app.use(express.json());
 app.use('/avatars', express.static('avatars'));
+app.use('/uploads', express.static('uploads'));
 
-// Middleware для проверки аутентификации
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({
-      success: false,
-      error: 'Токен отсутствует'
-    });
+    return res.status(401).json({ success: false, error: 'Токен отсутствует' });
   }
-  
+
   const token = authHeader.substring(7);
   const verification = verifyToken(token);
-  
+
   if (!verification.valid) {
-    return res.status(401).json({
-      success: false,
-      error: 'Неверный токен'
-    });
+    return res.status(401).json({ success: false, error: 'Неверный токен' });
   }
-  
-  // Добавляем данные пользователя в запрос
+
   req.user = verification.user;
   next();
 };
 
-// Настройка загрузки файлов
+// ============ FILE UPLOAD ============
 const uploadDir = './uploads/voice';
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
+  destination: (_, __, cb) => cb(null, uploadDir),
+  filename: (_, file, cb) => {
     const ext = path.extname(file.originalname) || '.webm';
     cb(null, Date.now() + ext);
-  }
+  },
 });
 
 const upload = multer({ storage });
 
-// ============ PUBLIC ROUTES (без аутентификации) ============
+// ============ SOCKET AUTH + EVENTS ============
+io.use((socket, next) => {
+  const token = socket.handshake.auth?.token;
+  if (!token) return next(new Error('No token'));
 
+  const verification = verifyToken(token);
+  if (!verification.valid || !verification.user) {
+    return next(new Error('Unauthorized'));
+  }
+
+  socket.data.user = verification.user;
+  next();
+});
+
+io.on('connection', (socket) => {
+  const userId = socket.data.user.userId;
+  
+  onlineUsers.add(userId);
+  console.log('🟢 Онлайн:', Array.from(onlineUsers));
+  io.emit('online:update', Array.from(onlineUsers));
+  // room на пользователя: минимально и чисто
+  socket.join(`user:${userId}`);
+
+  // initial sync по запросу клиента
+  socket.on('chats:request-sync', () => {
+    emitChatsSyncToUser(userId);
+  });
+
+  socket.on('online:request-sync', () => {
+    socket.emit('online:update', Array.from(onlineUsers));
+  });
+
+  socket.on('disconnect', () => {
+    onlineUsers.delete(userId);
+    console.log('🔴 Онлайн:', Array.from(onlineUsers));
+    io.emit('online:update', Array.from(onlineUsers));
+  });
+
+
+// 1. Когда Петя звонит Васе
+  socket.on('video:offer', ({ targetUserId, offer }) => {
+    console.log(`📞 Звонок от ${socket.data.user.username} к ${targetUserId}`);
+    // Пересылаем предложение Васе
+    io.to(`user:${targetUserId}`).emit('video:offer', {
+      from: socket.data.user.userId,
+      fromUsername: socket.data.user.username,
+      offer
+    });
+  });
+
+  // 2. Когда Вася отвечает Пете
+  socket.on('video:answer', ({ targetUserId, answer }) => {
+    io.to(`user:${targetUserId}`).emit('video:answer', {
+      from: socket.data.user.userId,
+      answer
+    });
+  });
+
+  // 3. Когда кто-то завершает звонок
+  socket.on('video:end', ({ targetUserId }) => {
+    io.to(`user:${targetUserId}`).emit('video:end');
+  });
+
+
+});
+
+
+
+// ============ PUBLIC ROUTES ============
 app.post('/api/register', async (req, res) => {
-  console.log('📨 Запрос на регистрацию:', req.body.username);
-  
   const { username, password } = req.body;
-  
+
   if (!username || !password) {
-    return res.status(400).json({
-      success: false,
-      error: 'Логин и пароль обязательны'
-    });
+    return res.status(400).json({ success: false, error: 'Логин и пароль обязательны' });
   }
-  
   if (username.length < 3) {
-    return res.status(400).json({
-      success: false,
-      error: 'Логин должен быть не менее 3 символов'
-    });
+    return res.status(400).json({ success: false, error: 'Логин должен быть не менее 3 символов' });
   }
-  
   if (password.length < 6) {
-    return res.status(400).json({
-      success: false,
-      error: 'Пароль должен быть не менее 6 символов'
-    });
+    return res.status(400).json({ success: false, error: 'Пароль должен быть не менее 6 символов' });
   }
-  
+
   const result = await registerUser(username, password);
-  
-  if (!result.success) {
-    return res.status(400).json(result);
-  }
-  
+  if (!result.success) return res.status(400).json(result);
+
+  // после регистрации у всех может измениться список чатов
+  getAllUsers().forEach((user) => emitChatsSyncToUser(user.id));
+
   res.json(result);
 });
 
 app.post('/api/login', async (req, res) => {
-  console.log('📨 Запрос на вход:', req.body.username);
-  
   const { username, password } = req.body;
-  
+
   if (!username || !password) {
-    return res.status(400).json({
-      success: false,
-      error: 'Логин и пароль обязательны'
-    });
+    return res.status(400).json({ success: false, error: 'Логин и пароль обязательны' });
   }
-  
+
   const result = await loginUser(username, password);
-  
-  if (!result.success) {
-    return res.status(401).json(result);
-  }
-  
+  if (!result.success) return res.status(401).json(result);
+
   res.json(result);
 });
 
 app.get('/api/check-auth', authenticateToken, (req, res) => {
-  res.json({
-    authenticated: true,
-    user: req.user
-  });
+  res.json({ authenticated: true, user: req.user });
 });
 
-// ============ PROTECTED ROUTES (требуют аутентификации) ============
-
-// Получить все чаты пользователя
+// ============ PROTECTED ROUTES ============
 app.get('/api/chats', authenticateToken, (req, res) => {
-  console.log('📨 Получен запрос на /api/chats от пользователя:', req.user.username);
-  
-  const userId = req.user.userId;
-  const chats = getChats(userId);
-  
+  const chats = getChats(req.user.userId);
   res.json(chats);
 });
 
-// Получить список чатов (упрощенная версия для боковой панели)
 app.get('/api/chats-list', authenticateToken, (req, res) => {
-  console.log('📨 Получен запрос на /api/chats-list от пользователя:', req.user.username);
-  
-  const userId = req.user.userId;
-  const chatsList = getChatsList(userId);
-  
+  const chatsList = getChatsList(req.user.userId);
   res.json(chatsList);
 });
 
-// Отправить текстовое сообщение
 app.post('/api/chats/:id/messages', authenticateToken, (req, res) => {
-  const chatId = parseInt(req.params.id);
+  const chatId = Number.parseInt(req.params.id, 10);
   const userId = req.user.userId;
   const { text } = req.body;
-  
-  console.log(`📨 Пользователь ${req.user.username} отправляет сообщение в чат ${chatId}: "${text}"`);
-  
+
+  if (Number.isNaN(chatId)) {
+    return res.status(400).json({ success: false, error: 'Некорректный chatId' });
+  }
   if (!text || text.trim() === '') {
-    return res.status(400).json({
-      success: false,
-      error: 'Текст сообщения не может быть пустым'
-    });
+    return res.status(400).json({ success: false, error: 'Текст сообщения не может быть пустым' });
   }
-  
+
   const newMessage = addMessageToChat(chatId, userId, text);
-  
   if (!newMessage) {
-    return res.status(403).json({
-      success: false,
-      error: 'Доступ к чату запрещен или чат не найден'
-    });
+    return res.status(403).json({ success: false, error: 'Доступ к чату запрещен или чат не найден' });
   }
-  
-  const updatedChats = getChats(userId);
+
+  const chat = getChatById(chatId, userId);
+  const participantIds = chat?.participants || [userId];
+  participantIds.forEach((id) => emitChatsSyncToUser(id));
 
   res.json({
     success: true,
     message: newMessage,
-    chats: updatedChats 
+    chats: getChats(userId),
   });
 });
 
-// Отправить голосовое сообщение
 app.post('/api/chats/:id/voice-upload', authenticateToken, upload.single('voice'), (req, res) => {
-  const chatId = parseInt(req.params.id);
+  const chatId = Number.parseInt(req.params.id, 10);
   const userId = req.user.userId;
   const file = req.file;
   const { duration } = req.body;
 
+  if (Number.isNaN(chatId)) {
+    return res.status(400).json({ success: false, error: 'Некорректный chatId' });
+  }
   if (!file) {
-    return res.status(400).json({ 
-      success: false,
-      error: 'Файл не загружен' 
-    });
+    return res.status(400).json({ success: false, error: 'Файл не загружен' });
   }
 
-  console.log(`📥 Пользователь ${req.user.username} загружает голосовое в чат ${chatId}: ${file.filename}`);
-
-  const fileUrl = `/uploads/voice/${file.filename}`;
-  
   const voiceData = {
-    file: fileUrl,
+    file: `/uploads/voice/${file.filename}`,
     duration: Number(duration),
-    mime: file.mimetype
+    mime: file.mimetype,
   };
 
   const newMessage = addMyVoiceMessageToChat(chatId, userId, voiceData);
-  
   if (!newMessage) {
-    // Удаляем загруженный файл, если не удалось добавить сообщение
     fs.unlinkSync(file.path);
-    return res.status(403).json({
-      success: false,
-      error: 'Доступ к чату запрещен или чат не найден'
-    });
+    return res.status(403).json({ success: false, error: 'Доступ к чату запрещен или чат не найден' });
   }
 
-  const updatedChats = getChats(userId);
+  const chat = getChatById(chatId, userId);
+  const participantIds = chat?.participants || [userId];
+  participantIds.forEach((id) => emitChatsSyncToUser(id));
 
   res.json({
     success: true,
     message: newMessage,
-    chats: updatedChats
+    chats: getChats(userId),
   });
 });
 
-// Удалить сообщение
 app.delete('/api/chats/:id/messages', authenticateToken, (req, res) => {
-  const chatId = parseInt(req.params.id);
+  const chatId = Number.parseInt(req.params.id, 10);
   const userId = req.user.userId;
   const { messageId } = req.body;
 
-  console.log(`📨 Пользователь ${req.user.username} удаляет сообщение ${messageId} из чата ${chatId}`);
-  
+  if (Number.isNaN(chatId)) {
+    return res.status(400).json({ success: false, error: 'Некорректный chatId' });
+  }
   if (typeof messageId !== 'number') {
-    return res.status(400).json({
-      success: false,
-      error: 'ID сообщения обязателен'
-    });
+    return res.status(400).json({ success: false, error: 'ID сообщения обязателен' });
   }
-  
+
   const isDeleted = deleteMessageFromChat(chatId, messageId, userId);
-  
   if (!isDeleted) {
-    return res.status(403).json({
-      success: false,
-      error: 'Не удалось удалить сообщение'
-    });
+    return res.status(403).json({ success: false, error: 'Не удалось удалить сообщение' });
   }
-  
+
+  const chat = getChatById(chatId, userId);
+  const participantIds = chat?.participants || [userId];
+  participantIds.forEach((id) => emitChatsSyncToUser(id));
+
   res.json({ success: true });
 });
 
-// ============ ADMIN/DEBUG ROUTES ============
-
-// Получить всех пользователей (для отладки)
-app.get('/api/debug/users', (req, res) => {
-  const users = getAllUsers();
-  res.json({ users });
+// ============ DEBUG ============
+app.get('/api/debug/users', (_, res) => {
+  res.json({ users: getAllUsers() });
 });
-
-// Статические файлы
-app.use('/uploads', express.static('uploads'));
 
 // ============ ERROR HANDLING ============
-
-// Обработка 404
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Эндпоинт не найден'
-  });
+  res.status(404).json({ success: false, error: 'Эндпоинт не найден' });
 });
 
-// Обработка ошибок
 app.use((err, req, res, next) => {
   console.error('❌ Ошибка сервера:', err);
-  
+
   if (err instanceof multer.MulterError) {
-    return res.status(400).json({
-      success: false,
-      error: 'Ошибка загрузки файла'
-    });
+    return res.status(400).json({ success: false, error: 'Ошибка загрузки файла' });
   }
-  
-  res.status(500).json({
-    success: false,
-    error: 'Внутренняя ошибка сервера'
-  });
+
+  res.status(500).json({ success: false, error: 'Внутренняя ошибка сервера' });
 });
 
-// ============ SERVER START ============
-
-// app.listen(PORT, () => {
-//   console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
-//   console.log('📡 Доступные эндпоинты:');
-//   console.log('   POST /api/register');
-//   console.log('   POST /api/login');
-//   console.log('   GET  /api/check-auth');
-//   console.log('   GET  /api/chats');
-//   console.log('   GET  /api/chats-list');
-//   console.log('   POST /api/chats/:id/messages');
-//   console.log('   POST /api/chats/:id/voice-upload');
-//   console.log('   DELETE /api/chats/:id/messages');
-//   console.log('\n🔐 Все эндпоинты кроме /api/register и /api/login требуют токена в заголовке:');
-//   console.log('   Authorization: Bearer <ваш_токен>');
-// });
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Сервер запущен на http://0.0.0.0:${PORT}`);
-  console.log(`🌐 Локально: http://localhost:${PORT}`);
+// ============ START ============
+httpServer.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server + Socket.IO started on http://localhost:${PORT}`);
   console.log(`🌐 В сети: http://192.168.1.113:${PORT}`);
 });

@@ -11,11 +11,12 @@ import { ChatProfilePanel } from '../widgets/chat-profile-panel';
 import { useAuthSession } from './model/useAuthSession';
 import { useChats } from './model/useChats';
 import { useChatsPolling } from './model/useChatsPolling';
+import { getToken } from '../shared/lib/auth/session';
+import { useChatsSocket } from './model/useChatsSocket';
 
 
 function App() {
-  const [showProfile, setShowProfile] = useState<boolean>(false);
-
+  
   const {
     isAuthenticated,
     setIsAuthenticated,
@@ -26,7 +27,9 @@ function App() {
 
   const { chats, setChats } = useChats({ isAuthenticated, currentUser });
 
-  useChatsPolling({ isAuthenticated, setChats, interval: 5000 });
+  // useChatsPolling({ isAuthenticated, setChats, interval: 5000 });
+  const token = getToken();
+  useChatsSocket({ isAuthenticated, token, setChats });
 
   if (authChecking) {
     return <div className='loading-screen'>Проверка авторизации...</div>;
@@ -83,13 +86,11 @@ function App() {
                 />
                 <PageChat
                   selectChatAPI={chats}
+                  currentUser={currentUser}
                   setChats={setChats}
-                  setShowProfile={setShowProfile}
                 />
                 <ChatProfilePanel
                   selectChatAPI={chats}
-                  showProfile={showProfile}
-                  setShowProfile={setShowProfile}
                 />
               </>
             }

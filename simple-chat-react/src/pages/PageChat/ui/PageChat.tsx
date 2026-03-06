@@ -2,20 +2,33 @@ import { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 
 import type {Chat} from '../../../entities/chat';
+import type { User } from '../../../entities/user';
 import type { MessageInput } from '../../../features/send-message/model/types';
 import { MessageComponent } from '../../../entities/message';
 import { ChatInput, sendMessage } from '../../../features/send-message';
 import { deleteMessage } from '../../../features/delete-message';
+import { OnlineDot } from '../../../features/online';
 import { config } from '../../../shared/config';
+import { FaceTimeButton } from '../../../features/face-time';
 import './PageChat.scss';
+
+import { useDispatch } from 'react-redux'
+import { openPartnerProfile } from '../../../features/show-partner-profile/profileSlice'
+
+
+
 
 interface PageChatProps {
   selectChatAPI: Chat[];
+  currentUser: User | null;
   setChats: (chats: Chat[]) => void;
-  setShowProfile: (show: boolean) => void;
 }
 
-export const PageChat = ({ selectChatAPI, setChats, setShowProfile }: PageChatProps) => {
+export const PageChat = ({ selectChatAPI, currentUser, setChats}: PageChatProps) => {
+
+  const dispatch = useDispatch()
+
+
   const { chatId } = useParams<{ chatId: string }>();
   const id = Number(chatId);
 
@@ -37,12 +50,14 @@ export const PageChat = ({ selectChatAPI, setChats, setShowProfile }: PageChatPr
   };
 
   const openProfile = (): void => {
-    setShowProfile(true);
+    // setShowProfile(true);
+    dispatch(openPartnerProfile())
   };
 
   const onVideoClick = (): void => {
     console.log('onVideo');
   };
+
 
   if (!Number.isFinite(id) || !selectChatAPI) {
     return (
@@ -63,13 +78,28 @@ export const PageChat = ({ selectChatAPI, setChats, setShowProfile }: PageChatPr
   return (
     <div className='Chat-container'>
       <div className='Chat-container__header' onClick={openProfile}>
-        <img
-          src={`${config.API_URL}${activeChatData.avatar}`}
-          alt='Аватар чата'
-          className='chat-avatar'
-        />
+        <div>
+        <div className='chat-avatar-wrap'>
+          <img
+            src={`${config.API_URL}${activeChatData.avatar}`}
+            alt='Аватар чата'
+            className='chat-avatar'
+          />
+          <div className='chat-avatar-online'>
+            <OnlineDot userId={activeChatData.partnerId} size={12} />
+          </div>
+        </div>
+        </div>
         <h2 className='Chat-container__chatTitle'>{activeChatData.name}</h2>
+        {currentUser && activeChatData.partnerId !== null && activeChatData.partnerId !== undefined && (
+          <FaceTimeButton
+            currentUser={{ id: currentUser.id, username: currentUser.username }}
+            targetUser={{ id: activeChatData.partnerId, username: activeChatData.name }}
+          />
+        )}
       </div>
+
+
 
       <div className='scroll-container' ref={messagesContainerRef}>
         {activeChatData.messages.length === 0 ? (
