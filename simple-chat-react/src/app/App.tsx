@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import './App.css';
@@ -9,8 +8,6 @@ import { PageChat } from '../pages/PageChat';
 import { PageLogin } from '../pages/PageLogin';
 import { ChatProfilePanel } from '../widgets/chat-profile-panel';
 import { useAuthSession } from './model/useAuthSession';
-import { useChats } from './model/useChats';
-import { useChatsPolling } from './model/useChatsPolling';
 import { getToken } from '../shared/lib/auth/session';
 import { useChatsSocket } from './model/useChatsSocket';
 
@@ -25,11 +22,8 @@ function App() {
     authChecking,
   } = useAuthSession();
 
-  const { chats, setChats } = useChats({ isAuthenticated, currentUser });
-
-  // useChatsPolling({ isAuthenticated, setChats, interval: 5000 });
   const token = getToken();
-  useChatsSocket({ isAuthenticated, token, setChats });
+  useChatsSocket({ isAuthenticated, token});
 
   if (authChecking) {
     return <div className='loading-screen'>Проверка авторизации...</div>;
@@ -63,7 +57,6 @@ function App() {
             element={
               <>
                 <PageChatList
-                  ChatsLog={chats}
                   currentUser={currentUser}
                   setIsAuthenticated={setIsAuthenticated}
                   setCurrentUser={setCurrentUser}
@@ -79,19 +72,14 @@ function App() {
             element={
               <>
                 <PageChatList
-                  ChatsLog={chats}
                   currentUser={currentUser}
                   setIsAuthenticated={setIsAuthenticated}
                   setCurrentUser={setCurrentUser}
                 />
                 <PageChat
-                  selectChatAPI={chats}
                   currentUser={currentUser}
-                  setChats={setChats}
                 />
-                <ChatProfilePanel
-                  selectChatAPI={chats}
-                />
+                <ChatProfilePanel />
               </>
             }
           />

@@ -1,22 +1,29 @@
 import { useEffect } from 'react';
 import type { Chat } from '../../entities/chat/model/types';
+import { useAppDispatch } from '../store/hooks';
+import { chatApi } from '../../entities/chat/api/chatApi';
 import { connectSocket, disconnectSocket, getSocket } from '../../shared/lib';
 
 interface UseChatsSocketParams {
   isAuthenticated: boolean;
   token: string | null;
-  setChats: (chats: Chat[]) => void;
 }
 
-export const useChatsSocket = ({ isAuthenticated, token, setChats }: UseChatsSocketParams) => {
+export const useChatsSocket = ({ isAuthenticated, token }: UseChatsSocketParams) => {
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     if (!isAuthenticated || !token) return;
 
     const socket = connectSocket(token);
 
-    const onChatsSync = (chats: Chat[]) => {
-      setChats(chats);
-    };
+	    const onChatsSync = (chats: Chat[]) => {
+	      dispatch(
+	        chatApi.util.updateQueryData('getChats', undefined, (draft) => {
+	          draft.splice(0, draft.length, ...chats);
+	        }),
+	      );
+	    };
 
     const onChatError = (payload: { message: string }) => {
       console.error('socket chat error:', payload.message);
@@ -34,5 +41,5 @@ export const useChatsSocket = ({ isAuthenticated, token, setChats }: UseChatsSoc
       s.off('chat:error', onChatError);
       disconnectSocket();
     };
-  }, [isAuthenticated, token, setChats]);
+  }, [dispatch, isAuthenticated, token]);
 };

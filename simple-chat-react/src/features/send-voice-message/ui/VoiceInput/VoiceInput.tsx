@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { uploadVoiceMessage } from '../../model/uploadVoiceMessage';
-import type { Chat } from '../../../../entities/chat/model/types';
+import { useUploadVoiceMessageMutation } from '../../../../entities/chat/api/chatApi';
 
 interface VoiceInputProps {
   currentChatId: number;
-  setChats: (chats: Chat[]) => void;
 }
 
-export const VoiceInput = ({ currentChatId, setChats }: VoiceInputProps) => {
+export const VoiceInput = ({ currentChatId}: VoiceInputProps) => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
@@ -16,6 +14,7 @@ export const VoiceInput = ({ currentChatId, setChats }: VoiceInputProps) => {
 
   const [recording, setRecording] = useState(false);
   const [permission, setPermission] = useState(false);
+  const [uploadVoiceMessage] = useUploadVoiceMessageMutation();
 
   const getErrorMessage = (error: unknown): string =>
     error instanceof Error ? error.message : 'Неизвестная ошибка';
@@ -52,11 +51,6 @@ export const VoiceInput = ({ currentChatId, setChats }: VoiceInputProps) => {
       return;
     }
 
-    if (!setChats) {
-      alert('Ошибка: не могу обновить чаты');
-      return;
-    }
-
     if (!hasMediaSupport()) {
       alert('Ваш браузер не поддерживает запись с микрофона');
       return;
@@ -90,12 +84,7 @@ export const VoiceInput = ({ currentChatId, setChats }: VoiceInputProps) => {
 
         if (shouldSendRef.current) {
           try {
-            await uploadVoiceMessage({
-              chatId: currentChatId,
-              file,
-              duration: 0,
-              setChats,
-            });
+            await uploadVoiceMessage({ chatId: currentChatId, file, duration: 0 }).unwrap();
           } catch (error: unknown) {
             alert(`Ошибка отправки: ${getErrorMessage(error)}`);
           }

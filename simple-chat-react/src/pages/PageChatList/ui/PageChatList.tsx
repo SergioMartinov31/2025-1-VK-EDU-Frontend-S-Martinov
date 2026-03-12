@@ -3,17 +3,15 @@ import { logout } from '../../../features/logout';
 import { config } from '../../../shared/config';
 import './PageChatList.scss';
 
-import type { Chat } from '../../../entities/chat';
 import type { User } from '../../../entities/user';
 
 interface PageChatListProps {
-  ChatsLog: Chat[];
   currentUser: User | null;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
   setCurrentUser: (user: User | null) => void;
 }
 
-export const PageChatList = ({ ChatsLog, currentUser, setIsAuthenticated, setCurrentUser }: PageChatListProps) => {
+export const PageChatList = ({currentUser, setIsAuthenticated, setCurrentUser }: PageChatListProps) => {
   const handleLogout = () => {
     logout({ setIsAuthenticated, setCurrentUser });
   };
@@ -31,7 +29,7 @@ export const PageChatList = ({ ChatsLog, currentUser, setIsAuthenticated, setCur
           </button>
         </div>
       )}
-      <ChatListPanel ChatsLog={ChatsLog} />
+      <ChatListPanel/>
     </div>
   );
 };

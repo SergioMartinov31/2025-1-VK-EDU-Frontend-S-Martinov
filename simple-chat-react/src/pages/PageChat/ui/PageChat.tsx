@@ -1,12 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 
-import type {Chat} from '../../../entities/chat';
 import type { User } from '../../../entities/user';
 import type { MessageInput } from '../../../features/send-message/model/types';
 import { MessageComponent } from '../../../entities/message';
-import { ChatInput, sendMessage } from '../../../features/send-message';
-import { deleteMessage } from '../../../features/delete-message';
+import { ChatInput } from '../../../features/send-message';
 import { OnlineDot } from '../../../features/online';
 import { config } from '../../../shared/config';
 import { FaceTimeButton } from '../../../features/face-time';
@@ -14,25 +12,27 @@ import './PageChat.scss';
 
 import { useAppDispatch } from '../../../app/store/hooks';
 import { openPartnerProfile } from '../../../features/show-partner-profile/profileSlice'
+import { useDeleteMessageMutation, useGetChatsQuery, useSendMessageMutation } from '../../../entities/chat/api/chatApi';
 
 
 
 
 interface PageChatProps {
-  selectChatAPI: Chat[];
   currentUser: User | null;
-  setChats: (chats: Chat[]) => void;
 }
 
-export const PageChat = ({ selectChatAPI, currentUser, setChats}: PageChatProps) => {
+export const PageChat = ({currentUser}: PageChatProps) => {
 
   const dispatch = useAppDispatch()
+  const [sendMessageMutation] = useSendMessageMutation();
+  const [deleteMessageMutation] = useDeleteMessageMutation();
 
 
   const { chatId } = useParams<{ chatId: string }>();
   const id = Number(chatId);
 
-  const activeChatData = selectChatAPI?.find((chat) => chat.id === id);
+  const { data: chats = [], isLoading, isError } = useGetChatsQuery(undefined);
+  const activeChatData = chats.find((chat) => chat.id === id);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -42,15 +42,15 @@ export const PageChat = ({ selectChatAPI, currentUser, setChats}: PageChatProps)
   }, [activeChatData?.messages, id]);
 
   const handleSendMessage = (messageObj: MessageInput): void => {
-    void sendMessage({ chatId: id, messageObj, setChats });
+    if (messageObj.type !== 'text' || !messageObj.text.trim()) return;
+    void sendMessageMutation({ chatId: id, text: messageObj.text });
   };
 
   const handleDeleteMessage = (messageId: number): void => {
-    void deleteMessage({ chatId: id, messageId, setChats });
+    void deleteMessageMutation({ chatId: id, messageId });
   };
 
   const openProfile = (): void => {
-    // setShowProfile(true);
     dispatch(openPartnerProfile())
   };
 
@@ -59,10 +59,18 @@ export const PageChat = ({ selectChatAPI, currentUser, setChats}: PageChatProps)
   };
 
 
-  if (!Number.isFinite(id) || !selectChatAPI) {
+  if (!Number.isFinite(id) || isLoading) {
     return (
       <div className='Chat-container'>
         <h2 className='Chat-container__selectTitle'>Загрузка чата...</h2>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className='Chat-container'>
+        <h2 className='Chat-container__selectTitle'>Ошибка загрузки чата</h2>
       </div>
     );
   }
@@ -123,7 +131,6 @@ export const PageChat = ({ selectChatAPI, currentUser, setChats}: PageChatProps)
       <ChatInput
         SendMessage={handleSendMessage}
         currentChatId={id}
-        setChats={setChats}
         onVideoClick={onVideoClick}
       />
     </div>

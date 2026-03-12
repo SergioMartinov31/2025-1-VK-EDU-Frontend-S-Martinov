@@ -1,27 +1,21 @@
 import { useParams } from 'react-router-dom';
-import type {Chat} from '../../../entities/chat';
 import { config } from '../../../shared/config';
 import './ChatProfilePanel.scss';
 
 import { useAppDispatch, useAppSelector } from '../../../app/store/hooks';
 import { closePartnerProfile } from '../../../features/show-partner-profile/profileSlice'
+import { useGetChatsQuery } from '../../../entities/chat/api/chatApi';
 
-interface ChatProfilePanelProps {
-  selectChatAPI: Chat[];
-}
-
-export const ChatProfilePanel = ({ selectChatAPI }: ChatProfilePanelProps) => {
+export const ChatProfilePanel = () => {
   const { chatId } = useParams();
   const id = parseInt(chatId, 10);
 
   const showProfilePartner = useAppSelector((state) => state.showProfilePartner.value);
   const dispatch = useAppDispatch()
 
-  if (!selectChatAPI) {
-    return null;
-  }
+  const { data: chats = [] } = useGetChatsQuery(undefined);
 
-  const activeChatData = selectChatAPI.find((chat) => chat.id === id);
+  const activeChatData = chats.find((chat) => chat.id === id);
 
   return (
     <div className={showProfilePartner ? 'Chat-Profile-active' : 'Chat-Profile'}>
