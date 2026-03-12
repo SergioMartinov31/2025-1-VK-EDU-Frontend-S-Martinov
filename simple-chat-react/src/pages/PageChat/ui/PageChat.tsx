@@ -12,7 +12,7 @@ import { config } from '../../../shared/config';
 import { FaceTimeButton } from '../../../features/face-time';
 import './PageChat.scss';
 
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '../../../app/store/hooks';
 import { openPartnerProfile } from '../../../features/show-partner-profile/profileSlice'
 
 
@@ -26,7 +26,7 @@ interface PageChatProps {
 
 export const PageChat = ({ selectChatAPI, currentUser, setChats}: PageChatProps) => {
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
 
   const { chatId } = useParams<{ chatId: string }>();

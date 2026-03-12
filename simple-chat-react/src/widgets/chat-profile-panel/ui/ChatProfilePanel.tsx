@@ -3,8 +3,7 @@ import type {Chat} from '../../../entities/chat';
 import { config } from '../../../shared/config';
 import './ChatProfilePanel.scss';
 
-import { useSelector, useDispatch } from 'react-redux'
-import type { RootState } from '../../../app/store/store';
+import { useAppDispatch, useAppSelector } from '../../../app/store/hooks';
 import { closePartnerProfile } from '../../../features/show-partner-profile/profileSlice'
 
 interface ChatProfilePanelProps {
@@ -15,8 +14,8 @@ export const ChatProfilePanel = ({ selectChatAPI }: ChatProfilePanelProps) => {
   const { chatId } = useParams();
   const id = parseInt(chatId, 10);
 
-  const showProfilePartner = useSelector((state: RootState) => state.showProfilePartner.value);
-  const dispatch = useDispatch()
+  const showProfilePartner = useAppSelector((state) => state.showProfilePartner.value);
+  const dispatch = useAppDispatch()
 
   if (!selectChatAPI) {
     return null;
