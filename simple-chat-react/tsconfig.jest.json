@@ -11,7 +11,9 @@
     "sourceMap": false,
     "inlineSources": false,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "jsx": "react-jsx"
   },
-  "include": ["src/shared/lib/auth/session.ts", "src/shared/lib/auth/session.test.ts"]
+  "include": ["src/**/*.test.ts"],
+  "exclude": ["node_modules", "dist", ".jest-build"]
 }
